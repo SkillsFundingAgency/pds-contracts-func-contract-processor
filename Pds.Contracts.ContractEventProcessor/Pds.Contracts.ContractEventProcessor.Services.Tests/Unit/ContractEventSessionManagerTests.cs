@@ -3,6 +3,7 @@ using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Newtonsoft.Json;
 using Pds.Contracts.ContractEventProcessor.Services.Implementations;
 using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
 using Pds.Contracts.ContractEventProcessor.Services.Models;
@@ -20,16 +21,15 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
         public async Task ProcessSessionMessageAsync_ReturnsExpectedResultTest()
         {
             // Arrange
-            var expectedBodyMessage = "test";
             var expected = new SessionWorkflowState();
-            var dummyMessage = GetDummyMessage(expectedBodyMessage);
+            var dummyMessage = GetDummyMessage();
 
             var mockSession = Mock.Of<IMessageSession>(MockBehavior.Strict);
             var mockLogger = Mock.Of<ILogger<IContractEventSessionManager>>(MockBehavior.Strict);
             var mockContractService = Mock.Of<IContractService>(MockBehavior.Strict);
             Mock.Get(mockContractService)
-                .Setup(c => c.ProcessMessage(expectedBodyMessage))
-                .ReturnsAsync(expectedBodyMessage)
+                .Setup(c => c.ProcessMessage(It.IsAny<ContractEvent>()))
+                .Returns(Task.CompletedTask)
                 .Verifiable();
 
             var mockStateManager = Mock.Of<IWorkflowStateManager>(MockBehavior.Strict);
@@ -52,8 +52,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
         public async Task ProcessSessionMessageAsync_SessionStateIsFaultedAndNotFailedMessage_ForwardsMessageToDLQTest()
         {
             // Arrange
-            var expectedBodyMessage = "test";
-            var dummyMessage = GetDummyMessage(expectedBodyMessage);
+            var dummyMessage = GetDummyMessage();
             var initialState = new SessionWorkflowState
             {
                 IsFaulted = true,
@@ -101,15 +100,14 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             Mock.Get(mockSession).Verify();
             Mock.Get(mockStateManager).Verify();
             Mock.Get(mockContractService)
-                .Verify(c => c.ProcessMessage(It.IsAny<string>()), Times.Never());
+                .Verify(c => c.ProcessMessage(It.IsAny<ContractEvent>()), Times.Never());
         }
 
         [TestMethod]
         public async Task ProcessSessionMessageAsync_SessionStateIsFaultedAndIsFailedMessage_ResetsSessionStateTest()
         {
             // Arrange
-            var expectedBodyMessage = "test";
-            var dummyMessage = GetDummyMessage(expectedBodyMessage);
+            var dummyMessage = GetDummyMessage();
             var initialState = new SessionWorkflowState
             {
                 IsFaulted = true,
@@ -121,8 +119,8 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             var mockLogger = Mock.Of<ILogger<IContractEventSessionManager>>(MockBehavior.Strict);
             var mockContractService = Mock.Of<IContractService>(MockBehavior.Strict);
             Mock.Get(mockContractService)
-                .Setup(c => c.ProcessMessage(expectedBodyMessage))
-                .ReturnsAsync(expectedBodyMessage)
+                .Setup(c => c.ProcessMessage(It.IsAny<ContractEvent>()))
+                .Returns(Task.CompletedTask)
                 .Verifiable();
 
             var mockStateManager = Mock.Of<IWorkflowStateManager>(MockBehavior.Strict);
@@ -151,7 +149,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
         public void ProcessSessionMessageAsync_DoesNotSetSessionStateAndThrowsException()
         {
             // Arrange
-            var expectedBodyMessage = "test";
+            var expectedBodyMessage = new ContractEvent();
             var dummyMessage = GetDummyMessage(expectedBodyMessage);
             var initialState = new SessionWorkflowState();
             var mockSession = Mock.Of<IMessageSession>(MockBehavior.Strict);
@@ -182,15 +180,9 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
         public void ProcessSessionMessageAsync_SetsSessionStateAndThrowsException()
         {
             // Arrange
-            var expectedBodyMessage = "test";
+            var expectedBodyMessage = new ContractEvent();
             var dummyMessage = GetDummyMessage(expectedBodyMessage, 10);
             var initialState = new SessionWorkflowState();
-            var expectedState = new SessionWorkflowState
-            {
-                IsFaulted = true,
-                FailedMessageId = dummyMessage.MessageId
-            };
-
             var mockSession = Mock.Of<IMessageSession>(MockBehavior.Strict);
             Mock.Get(mockSession)
                 .SetupGet(s => s.SessionId)
@@ -231,12 +223,12 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             Mock.Get(mockLogger).Verify();
         }
 
-        private static Message GetDummyMessage(string expectedBodyMessage, int deliveryCount = 1)
+        private static Message GetDummyMessage(ContractEvent expectedBodyMessage = null, int deliveryCount = 1)
         {
             Message dummyMessage = new Message
             {
                 MessageId = "1",
-                Body = Encoding.UTF8.GetBytes(expectedBodyMessage)
+                Body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(expectedBodyMessage ?? new ContractEvent()))
             };
 
             //Workaround to set internal get properties

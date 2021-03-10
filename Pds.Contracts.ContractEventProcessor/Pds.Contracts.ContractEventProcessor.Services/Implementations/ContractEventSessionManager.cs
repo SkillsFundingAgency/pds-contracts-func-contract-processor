@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
 using Pds.Contracts.ContractEventProcessor.Services.Models;
 using System.Text;
@@ -49,7 +50,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
 
                 try
                 {
-                    var contractEvent = Encoding.UTF8.GetString(message.Body);
+                    var contractEvent = JsonConvert.DeserializeObject<ContractEvent>(Encoding.UTF8.GetString(message.Body));
                     await _contractService.ProcessMessage(contractEvent);
                 }
                 catch

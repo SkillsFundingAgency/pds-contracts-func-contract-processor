@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
+using Pds.Contracts.ContractEventProcessor.Services.Models;
+using Pds.Contracts.Data.Api.Client.Interfaces;
+using System;
 using System.Threading.Tasks;
 
 namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
@@ -10,27 +13,32 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
     public class ContractService : IContractService
     {
         private readonly ILogger<IContractService> _logger;
+        private readonly IContractsDataService _contractsDataService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContractService"/> class.
         /// </summary>
         /// <param name="logger">The logger.</param>
-        public ContractService(ILogger<IContractService> logger)
+        /// <param name="contractsDataService">The contracts data service.</param>
+        public ContractService(ILogger<IContractService> logger, IContractsDataService contractsDataService)
         {
             _logger = logger;
+            _contractsDataService = contractsDataService;
         }
 
         /// <inheritdoc/>
-        public async Task<string> ProcessMessage(string contractEvent)
+        public async Task ProcessMessage(ContractEvent contractEvent)
         {
-            _logger.LogInformation($"Processing message {contractEvent}");
+            _logger.LogInformation($"Processing message for contract event : {contractEvent.BookmarkId}");
 
-            if (contractEvent.ToLower().Contains("throw-exception") && contractEvent.Contains("\"ExampleSequenceId\":0"))
+            // Added sample implementation of contracts data api - remove this comment during full implementation.
+            var existingContract = await _contractsDataService.GetContractByContractNumberAndVersionAsync(contractEvent.ContractNumber, contractEvent.ContractVersion);
+            if (existingContract is null)
             {
-                throw new System.Exception("Testing faulty session.");
+                throw new ArgumentOutOfRangeException(nameof(contractEvent));
             }
 
-            return await Task.FromResult(contractEvent);
+            _logger.LogInformation($"Found contract with contract number [{existingContract.ContractNumber}], version [{existingContract.ContractVersion}] and Id [{existingContract.Id}]");
         }
     }
 }

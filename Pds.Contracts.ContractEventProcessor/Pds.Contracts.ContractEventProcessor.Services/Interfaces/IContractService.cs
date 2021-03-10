@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Pds.Contracts.ContractEventProcessor.Services.Models;
+using System.Threading.Tasks;
 
 namespace Pds.Contracts.ContractEventProcessor.Services.Interfaces
 {
@@ -12,8 +13,8 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Interfaces
         /// </summary>
         /// <param name="contractEvent">The contract event.</param>
         /// <returns>
-        /// The hello string.
+        /// Async task completion.
         /// </returns>
-        Task<string> ProcessMessage(string contractEvent);
+        Task ProcessMessage(ContractEvent contractEvent);
     }
 }
