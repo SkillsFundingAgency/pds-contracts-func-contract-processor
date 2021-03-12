@@ -14,7 +14,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
     public class WorkflowStateManager : IWorkflowStateManager
     {
         /// <inheritdoc/>
-        public async Task SetWorkflowStateAsync(IMessageSession messageSession, SessionWorkflowState state)
+        public async Task SetWorkflowStateAsync(IMessageSession session, SessionWorkflowState state)
         {
             byte[] bytes = null;
             if (state != null)
@@ -23,13 +23,13 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                 bytes = Encoding.UTF8.GetBytes(json);
             }
 
-            await messageSession.SetStateAsync(bytes);
+            await session.SetStateAsync(bytes);
         }
 
         /// <inheritdoc/>
-        public async Task<SessionWorkflowState> GetWorkflowStateAsync(IMessageSession messageSession)
+        public async Task<SessionWorkflowState> GetWorkflowStateAsync(IMessageSession session)
         {
-            byte[] bytes = await messageSession.GetStateAsync();
+            byte[] bytes = await session.GetStateAsync();
 
             var state = new SessionWorkflowState();
             if (bytes != null)
@@ -42,9 +42,9 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
         }
 
         /// <inheritdoc/>
-        public async Task<SessionWorkflowState> ResetWorkflowStateAsync(IMessageSession messageSession)
+        public async Task<SessionWorkflowState> ResetWorkflowStateAsync(IMessageSession session)
         {
-            await messageSession.SetStateAsync(null);
+            await session.SetStateAsync(null);
             return new SessionWorkflowState();
         }
     }
