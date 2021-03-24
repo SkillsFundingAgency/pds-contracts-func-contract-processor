@@ -65,22 +65,28 @@
     "AuditApiAzureAdAppUri": {
       "type": "string"
     },
-    "FcsSharepointApiBaseAddress": {
+    "SharepointApiBaseAddress": {
       "type": "string"
     },
-    "FcsSharepointApiAuthority": {
+    "SharepointApiAuthority": {
       "type": "string"
     },
-    "FcsSharepointApiTenant": {
+    "SharepointApiTenant": {
       "type": "string"
     },
-    "FcsSharepointApiClientId": {
+    "SharepointApiClientId": {
       "type": "string"
     },
-    "FcsSharepointApiClientSecret": {
+    "SharepointApiClientSecret": {
       "type": "securestring"
     },
-    "FcsSharepointApiAppUri": {
+    "SharepointApiAppUri": {
+      "type": "string"
+    },
+    "SharePointApiRelativeSiteUrl": {
+      "type": "string"
+    },
+    "SharepointApiPublicationFolderPrefix": {
       "type": "string"
     }
   },
@@ -221,28 +227,40 @@
                 "value": "[parameters('AuditApiAzureAdAppUri')]"
               },
               {
-                "name": "FcsSharePointClientConfiguration:ApiBaseAddress",
-                "value": "[parameters('FcsSharepointApiBaseAddress')]"
+                "name": "MaximumDeliveryCount",
+                "value": "9"
               },
               {
-                "name": "FcsSharePointClientConfiguration:Authority",
-                "value": "[parameters('FcsSharepointApiAuthority')]"
+                "name": "SPClientServiceConfiguration:ApiBaseAddress",
+                "value": "[parameters('SharepointApiBaseAddress')]"
               },
               {
-                "name": "FcsSharePointClientConfiguration:TenantId",
-                "value": "[parameters('FcsSharepointApiTenant')]"
+                "name": "SPClientServiceConfiguration:Authority",
+                "value": "[parameters('SharepointApiAuthority')]"
               },
               {
-                "name": "FcsSharePointClientConfiguration:ClientId",
-                "value": "[parameters('FcsSharepointApiClientId')]"
+                "name": "SPClientServiceConfiguration:ClientId",
+                "value": "[parameters('SharepointApiClientId')]"
               },
               {
-                "name": "FcsSharePointClientConfiguration:ClientSecret",
-                "value": "[parameters('FcsSharepointApiClientSecret')]"
+                "name": "SPClientServiceConfiguration:ClientSecret",
+                "value": "[parameters('SharepointApiClientSecret')]"
               },
               {
-                "name": "FcsSharePointClientConfiguration:AppUri",
-                "value": "[parameters('FcsSharepointApiAppUri')]"
+                "name": "SPClientServiceConfiguration:TenantId",
+                "value": "[parameters('SharepointApiTenant')]"
+              },
+              {
+                "name": "SPClientServiceConfiguration:AppUri",
+                "value": "[parameters('SharepointApiAppUri')]"
+              },
+              {
+                "name": "SPClientServiceConfiguration:RelativeSiteURL",
+                "value": "[parameters('SharePointApiRelativeSiteUrl')]"
+              },
+              {
+                "name": "SPClientServiceConfiguration:PublicationFolderPrefix",
+                "value": "[parameters('SharepointApiPublicationFolderPrefix')]"
               }
             ]
           }
