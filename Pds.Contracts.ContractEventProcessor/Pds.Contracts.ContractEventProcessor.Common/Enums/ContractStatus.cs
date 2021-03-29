@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Pds.Contracts.ContractEventProcessor.Services.Models
+namespace Pds.Contracts.ContractEventProcessor.Common.Enums
 {
     /// <summary>
     /// Represents the states a contract can be in.
@@ -52,6 +52,50 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Models
         /// The contract has been replaced with a notification or variation.
         /// </summary>
         [Display(Name = "Replaced", Description = "Contract replaced")]
-        Replaced = 6
+        Replaced = 6,
+
+        /// <summary>
+        /// The contract has been modified.
+        /// </summary>
+        [Display(Name = "Modified", Description = "Modified")]
+        Modified = 7,
+
+        /// <summary>
+        /// The contract is under termination
+        /// </summary>
+        [Display(Name = "Under Termination", Description = "Under Termination")]
+        UnderTermination = 8,
+
+        /// <summary>
+        /// Contract closed.
+        /// </summary>
+        [Display(Name = "Closed", Description = "Closed")]
+        Closed,
+
+        /// <summary>
+        /// Contract terminated.
+        /// </summary>
+        [Display(Name = "Terminated", Description = "Terminated")]
+        Terminated,
+
+        /// <summary>
+        /// Contract is draft.
+        /// </summary>
+        Draft,
+
+        /// <summary>
+        /// Contract is unassigned.
+        /// </summary>
+        Unassigned,
+
+        /// <summary>
+        /// Contract is in review.
+        /// </summary>
+        InReview,
+
+        /// <summary>
+        /// Contract is awaiting internal approval
+        /// </summary>
+        AwaitingInternalApproval,
     }
 }

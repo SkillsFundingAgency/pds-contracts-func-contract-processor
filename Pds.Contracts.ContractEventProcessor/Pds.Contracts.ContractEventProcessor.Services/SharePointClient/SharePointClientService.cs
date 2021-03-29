@@ -1,0 +1,78 @@
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.SharePoint.Client;
+using Pds.Contracts.ContractEventProcessor.Common.CustomExceptionHandlers;
+using Pds.Contracts.ContractEventProcessor.Services.Configurations;
+using Pds.Contracts.ContractEventProcessor.Services.Extensions;
+using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
+using System.IO;
+using System.Threading.Tasks;
+
+namespace Pds.Contracts.ContractEventProcessor.Services.SharePointClient
+{
+    /// <summary>
+    /// The SharePoint Client Service.
+    /// </summary>
+    public class SharePointClientService : ISharePointClientService
+    {
+        private readonly ILogger<ISharePointClientService> _logger;
+        private readonly ClientContext _clientContext;
+        private readonly SPClientServiceConfiguration _spConfig;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SharePointClientService"/> class.
+        /// </summary>
+        /// <param name="logger">ILogger reference to log output.</param>
+        /// <param name="clientContext">The SharePoint Client Context.</param>
+        /// <param name="spClientServiceConfiguration">The SharePoint Client Service configuration.</param>
+        public SharePointClientService(
+            ILogger<ISharePointClientService> logger,
+            ClientContext clientContext,
+            IOptions<SPClientServiceConfiguration> spClientServiceConfiguration)
+        {
+            _logger = logger;
+            _clientContext = clientContext;
+            _spConfig = spClientServiceConfiguration.Value;
+        }
+
+        /// <summary>
+        /// Returns the document stream for the given file name in specified library.
+        /// </summary>
+        /// <param name="filename">The document to find and stream.</param>
+        /// <param name="libraryName">The folder name of the document location.</param>
+        /// <returns> A stream containing the contents of the document. </returns>
+        public async Task<byte[]> GetDocument(string filename, string libraryName)
+        {
+            _logger.LogInformation($"[{nameof(GetDocument)}] - Attempting to connect to SharePoint location.");
+
+            //SaveFileToLocal();
+            try
+            {
+                var file = _clientContext.Web.GetFileByServerRelativeUrl($"{_spConfig.RelativeSiteURL}/{libraryName}/{filename}");
+                _clientContext.Load(file);
+                if (file is null)
+                {
+                    _logger.LogError($"[{nameof(GetDocument)}] - File not found: {_spConfig.RelativeSiteURL}/{libraryName}/{filename}");
+                    throw new DocumentNotFoundException($"[{nameof(GetDocument)}] - File not found: {_spConfig.RelativeSiteURL}/{libraryName}/{filename}");
+                }
+
+                ClientResult<Stream> stream = file.OpenBinaryStream();
+                await _clientContext.ExecuteQueryAsync();
+
+                if (stream.Value is null)
+                {
+                    _logger.LogError($"[{nameof(GetDocument)}] - File not stream from location: {_spConfig.RelativeSiteURL}/{libraryName}/{filename}");
+                    throw new DocumentNotFoundException($"[{nameof(GetDocument)}] - File not found: {_spConfig.RelativeSiteURL}/{libraryName}/{filename}");
+                }
+
+                _logger.LogInformation($"[{nameof(GetDocument)}] - File stream location: {_spConfig.RelativeSiteURL}/{libraryName}/{filename} completed.");
+                return stream.Value.ToByteArray();
+            }
+            catch (ServerException ex)
+            {
+                _logger.LogError(ex, $"[{nameof(GetDocument)}] - The contract pdf file is not accessible. File: {_spConfig.RelativeSiteURL}/{libraryName}/{filename}");
+                throw new DocumentNotAccessibleException("The contract pdf file is not accessible.", ex);
+            }
+        }
+    }
+}

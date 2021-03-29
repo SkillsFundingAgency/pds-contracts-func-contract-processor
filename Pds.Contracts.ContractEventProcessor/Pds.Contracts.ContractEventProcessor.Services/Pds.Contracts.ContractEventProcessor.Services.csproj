@@ -10,11 +10,22 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="5.1.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.11" />
+    <PackageReference Include="Aspose.PDF" Version="21.3.0" />
+    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="5.1.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.13" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.11" />
-    <PackageReference Include="Pds.Contracts.Data.Api.Client" Version="0.1.0-alpha0017" />
+    <PackageReference Include="Microsoft.SharePointOnline.CSOM" Version="16.1.20211.12000" />
+    <PackageReference Include="Pds.Contracts.Data.Api.Client" Version="0.1.0-alpha0020" />
     <PackageReference Include="Pds.Core.CodeAnalysis.StyleCop" Version="2.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.9.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Pds.Contracts.ContractEventProcessor.Common\Pds.Contracts.ContractEventProcessor.Common.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="DocumentServices\Resources\" />
   </ItemGroup>
 
 </Project>

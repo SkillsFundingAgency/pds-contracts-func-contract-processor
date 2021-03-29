@@ -1,8 +1,13 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Pds.Contracts.ContractEventProcessor.Services.Configurations;
+using Pds.Contracts.ContractEventProcessor.Services.DocumentServices;
 using Pds.Contracts.ContractEventProcessor.Services.Implementations;
 using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
+using Pds.Contracts.ContractEventProcessor.Services.SharePointClient;
 using Pds.Contracts.Data.Api.Client.Registrations;
+using Pds.Core.ApiClient.Interfaces;
+using Pds.Core.ApiClient.Services;
 
 namespace Pds.Contracts.ContractEventProcessor.Services.DependencyInjection
 {
@@ -19,12 +24,21 @@ namespace Pds.Contracts.ContractEventProcessor.Services.DependencyInjection
         /// <returns>A reference to this instance after the operation has completed.</returns>
         public static IServiceCollection AddFeatureServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddSingleton<IContractEventSessionManager, ContractEventSessionManager>();
+            services.AddScoped<IContractEventSessionManager, ContractEventSessionManager>();
             services.AddSingleton<IWorkflowStateManager, WorkflowStateManager>();
-            services.AddSingleton<IContractService, ContractService>();
+            services.AddScoped<IContractService, ContractService>();
+            services.AddSingleton<IValidationService, ValidationService>();
+            services.AddSingleton<IContractApprovalService, ContractApprovalService>();
 
             var policyRegistry = services.AddPolicyRegistry();
             services.AddContractsDataApiClient(configuration, policyRegistry);
+            services.Configure<SPClientServiceConfiguration>(options => configuration.GetSection(nameof(SPClientServiceConfiguration)).Bind(options));
+            services.AddSharePointClientContext();
+            services.AddScoped<IContractCreationService, ContractCreationService>();
+            services.AddScoped<ISharePointClientService, SharePointClientService>();
+            services.AddSingleton<IContractProcessorService, ContractProcessorService>();
+            services.AddAsposeLicense();
+            services.AddSingleton<IDocumentManagementService, AsposeDocumentManagementService>();
 
             return services;
         }

@@ -32,7 +32,6 @@ namespace Pds.Contracts.ContractEventProcessor.Func
 
         private void BuildAppInsightsConfiguration(PdsApplicationInsightsConfiguration options)
         {
-            // TODO : Determine where the App insights keys are to be defined - Environment? do we need devops?
             options.InstrumentationKey = System.Environment.GetEnvironmentVariable("PdsApplicationInsights:InstrumentationKey");
             options.Environment = System.Environment.GetEnvironmentVariable("PdsApplicationInsights:Environment");
             options.Component = GetType().Assembly.GetName().Name;

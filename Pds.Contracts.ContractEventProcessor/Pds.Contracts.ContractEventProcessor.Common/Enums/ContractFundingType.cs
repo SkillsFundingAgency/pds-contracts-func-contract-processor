@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Pds.Contracts.ContractEventProcessor.Services.Models
+namespace Pds.Contracts.ContractEventProcessor.Common.Enums
 {
     /// <summary>
     /// The types of funding that the system supports.

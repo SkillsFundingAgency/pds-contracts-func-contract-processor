@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Converters;
+using Pds.Contracts.ContractEventProcessor.Common.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
@@ -61,12 +62,17 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Models
         /// <summary>
         /// Gets or sets the start date.
         /// </summary>
-        public DateTime StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
 
         /// <summary>
         /// Gets or sets the end date.
         /// </summary>
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the signed on date.
+        /// </summary>
+        public DateTime? SignedOn { get; set; }
 
         /// <summary>
         /// Gets or sets the contract type.
