@@ -5,7 +5,9 @@ using Pds.Contracts.ContractEventProcessor.Common.CustomExceptionHandlers;
 using Pds.Contracts.ContractEventProcessor.Services.Configurations;
 using Pds.Contracts.ContractEventProcessor.Services.Extensions;
 using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
+using System;
 using System.IO;
+using System.Resources;
 using System.Threading.Tasks;
 
 namespace Pds.Contracts.ContractEventProcessor.Services.SharePointClient
@@ -15,6 +17,16 @@ namespace Pds.Contracts.ContractEventProcessor.Services.SharePointClient
     /// </summary>
     public class SharePointClientService : ISharePointClientService
     {
+        /// <summary>
+        /// Gets the embeded resources namespace.
+        /// </summary>
+        /// <value>
+        /// The embeded resources namespace.
+        /// </value>
+        internal static string EmbededResourcesNamespace => "Pds.Contracts.ContractEventProcessor.Services.DocumentServices.Resources.ContractPdf";
+
+        private static string TestContractPdfFileName => $"{EmbededResourcesNamespace}12345678_Test_v1.pdf";
+
         private readonly ILogger<ISharePointClientService> _logger;
         private readonly ClientContext _clientContext;
         private readonly SPClientServiceConfiguration _spConfig;
@@ -45,15 +57,17 @@ namespace Pds.Contracts.ContractEventProcessor.Services.SharePointClient
         {
             _logger.LogInformation($"[{nameof(GetDocument)}] - Attempting to connect to SharePoint location.");
 
+            string fileRelativeUrl = $"{_spConfig.RelativeSiteURL}/{libraryName}/{filename}";
+
             //SaveFileToLocal();
             try
             {
-                var file = _clientContext.Web.GetFileByServerRelativeUrl($"{_spConfig.RelativeSiteURL}/{libraryName}/{filename}");
+                var file = _clientContext.Web.GetFileByServerRelativeUrl(fileRelativeUrl);
                 _clientContext.Load(file);
                 if (file is null)
                 {
-                    _logger.LogError($"[{nameof(GetDocument)}] - File not found: {_spConfig.RelativeSiteURL}/{libraryName}/{filename}");
-                    throw new DocumentNotFoundException($"[{nameof(GetDocument)}] - File not found: {_spConfig.RelativeSiteURL}/{libraryName}/{filename}");
+                    _logger.LogError($"[{nameof(GetDocument)}] - File not found: {fileRelativeUrl}");
+                    return HandleFileNotFoundExceptionWithTestPdf(new DocumentNotFoundException($"[{nameof(GetDocument)}] - File not found: {fileRelativeUrl}"));
                 }
 
                 ClientResult<Stream> stream = file.OpenBinaryStream();
@@ -61,17 +75,39 @@ namespace Pds.Contracts.ContractEventProcessor.Services.SharePointClient
 
                 if (stream.Value is null)
                 {
-                    _logger.LogError($"[{nameof(GetDocument)}] - File not stream from location: {_spConfig.RelativeSiteURL}/{libraryName}/{filename}");
-                    throw new DocumentNotFoundException($"[{nameof(GetDocument)}] - File not found: {_spConfig.RelativeSiteURL}/{libraryName}/{filename}");
+                    _logger.LogError($"[{nameof(GetDocument)}] - File not stream from location: {fileRelativeUrl}");
+                    return HandleFileNotFoundExceptionWithTestPdf(new DocumentNotFoundException($"[{nameof(GetDocument)}] - File not found: {fileRelativeUrl}"));
                 }
 
-                _logger.LogInformation($"[{nameof(GetDocument)}] - File stream location: {_spConfig.RelativeSiteURL}/{libraryName}/{filename} completed.");
+                _logger.LogInformation($"[{nameof(GetDocument)}] - File stream location: {fileRelativeUrl} completed.");
                 return stream.Value.ToByteArray();
             }
             catch (ServerException ex)
             {
-                _logger.LogError(ex, $"[{nameof(GetDocument)}] - The contract pdf file is not accessible. File: {_spConfig.RelativeSiteURL}/{libraryName}/{filename}");
-                throw new DocumentNotAccessibleException("The contract pdf file is not accessible.", ex);
+                _logger.LogError(ex, $"[{nameof(GetDocument)}] - The contract pdf file is not accessible. File: {fileRelativeUrl}");
+                return HandleFileNotFoundExceptionWithTestPdf(new DocumentNotAccessibleException("The contract pdf file is not accessible.", ex));
+            }
+        }
+
+        private byte[] HandleFileNotFoundExceptionWithTestPdf<TException>(TException ex)
+            where TException : Exception
+        {
+            if (_spConfig.ShouldErrorPdfNotFound)
+            {
+                throw ex;
+            }
+            else
+            {
+                using var stream = typeof(SharePointClientService).Assembly.GetManifestResourceStream(TestContractPdfFileName);
+                if (stream is null)
+                {
+                    throw new MissingManifestResourceException($"Failed to locate test contract PDF file ({TestContractPdfFileName}) in current assembly.");
+                }
+                else
+                {
+                    _logger.LogWarning($"[{nameof(HandleFileNotFoundExceptionWithTestPdf)}] - The contract pdf file have been replaced by the test contract pdf file.");
+                    return stream.ToByteArray();
+                }
             }
         }
     }

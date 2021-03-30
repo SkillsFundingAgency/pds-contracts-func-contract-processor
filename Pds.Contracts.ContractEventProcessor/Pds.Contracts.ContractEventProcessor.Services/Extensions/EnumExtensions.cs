@@ -22,5 +22,18 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Extensions
                            .GetCustomAttribute<DisplayAttribute>()
                            .Name;
         }
+
+        /// <summary>
+        /// Get Enum Short Name.
+        /// </summary>
+        /// <param name="enumType">Enum.</param>
+        /// <returns>Returns the display name of the Enum.</returns>
+        public static string GetEnumShortName(this Enum enumType)
+        {
+            return enumType.GetType().GetMember(enumType.ToString())
+                           .First()
+                           .GetCustomAttribute<DisplayAttribute>()
+                           .ShortName;
+        }
     }
 }

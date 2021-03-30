@@ -361,6 +361,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
         [TestMethod]
         [DataRow("Levy-1799-Output-Documents for Publication", "Levy1799OutputDocuments%20for%20Publication")]
         [DataRow("Abc-xyz-Output-Documents for Publication", "AbcxyzOutputDocuments%20for%20Publication")]
+        [DataRow("24+LOANS-1718-Output-Documents for Publication", "24LOANS1718OutputDocuments%20for%20Publication")]
         public void GetUrlSafeFolderNameForContractDocument_ExpectedResult(string folderName, string expected)
         {
             //Arrange

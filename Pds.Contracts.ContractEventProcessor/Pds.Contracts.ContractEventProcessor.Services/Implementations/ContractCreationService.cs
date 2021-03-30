@@ -64,7 +64,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
 
             var createRequest = _contractProcessorService.GetCreateRequest(contractEvent);
             var fileName = _contractProcessorService.GetFileNameForContractDocument(contractEvent.UKPRN, contractEvent.ContractNumber, contractEvent.ContractVersion);
-            var folderName = _contractProcessorService.GetFolderNameForContractDocument(contractEvent.FundingType.ToString("G"), contractEvent.ContractPeriodValue, _spConfig.PublicationFolderSuffix);
+            var folderName = _contractProcessorService.GetFolderNameForContractDocument(contractEvent.FundingType.GetEnumShortName(), contractEvent.ContractPeriodValue, _spConfig.PublicationFolderSuffix);
             var urlSafeFolderName = _contractProcessorService.GetUrlSafeFolderNameForContractDocument(folderName);
             var pdfDoc = await _sharePointClientService.GetDocument(fileName, urlSafeFolderName);
             var pdfADoc = _documentManagementService.ConvertToPdfA(pdfDoc);

@@ -21,5 +21,32 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             // Assert
             actual.Should().Be(expected);
         }
+
+        [TestMethod]
+        public void GetEnumShortName_Test()
+        {
+            // Arrange
+            string expected = "CityDeals";
+            var arrange = ContractFundingType.CityDeals;
+
+            // Act
+            var actual = arrange.GetEnumShortName();
+
+            // Assert
+            actual.Should().Be(expected);
+        }
+
+        [TestMethod]
+        public void GetEnumShortName_ReturnsNullTest()
+        {
+            // Arrange
+            var arrange = ContractFundingType.Unknown;
+
+            // Act
+            var actual = arrange.GetEnumShortName();
+
+            // Assert
+            actual.Should().BeNull();
+        }
     }
 }

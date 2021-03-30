@@ -60,11 +60,11 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Interfaces
         /// <summary>
         /// Get folder name for the contract document Which is a sharepoint document title.
         /// </summary>
-        /// <param name="fundingType">The contract funding type.</param>
+        /// <param name="fundingTypeShortName">The contract funding type short name attributes.</param>
         /// <param name="period">The period.</param>
         /// <param name="sufFix">The suffix text to be added at the end.</param>
         /// <returns>Returns sharepoint document title text.</returns>
-        string GetFolderNameForContractDocument(string fundingType, string period, string sufFix);
+        string GetFolderNameForContractDocument(string fundingTypeShortName, string period, string sufFix);
 
         /// <summary>
         /// Get user friendly Year.

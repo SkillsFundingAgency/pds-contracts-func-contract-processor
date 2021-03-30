@@ -12,6 +12,7 @@
 **/appsettings.json
 **/local.settings.json
 **/.DS_Store
+*.lic
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

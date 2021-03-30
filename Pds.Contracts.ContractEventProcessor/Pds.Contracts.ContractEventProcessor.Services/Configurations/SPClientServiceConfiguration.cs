@@ -21,5 +21,10 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Configurations
         /// Gets or Sets the Publication Folder Suffix.
         /// </summary>
         public string PublicationFolderSuffix { get; set; }
+
+        /// <summary>
+        /// Gets or Sets a value indicating whether should throw error if the contract Pdf Not Found in the sharepoint.
+        /// </summary>
+        public bool ShouldErrorPdfNotFound { get; set; } = true;
     }
 }

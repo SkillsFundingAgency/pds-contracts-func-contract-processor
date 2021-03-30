@@ -6,13 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="DocumentServices\Resources\Aspose.Total.lic" />
+    <None Remove="DocumentServices\Resources\ContractPdf\12345678_Test_v1.pdf" />
     <None Remove="Pds.Contracts.ContractEventProcessor.Services.csproj.transform" />
   </ItemGroup>
 
-	<ItemGroup>
-		<EmbeddedResource Include="DocumentServices\Resources\Aspose.Total.lic" />
-	</ItemGroup>
-
+  <ItemGroup>
+    <EmbeddedResource Include="DocumentServices\Resources\Aspose.Total.lic" />
+    <EmbeddedResource Include="DocumentServices\Resources\ContractPdf\12345678_Test_v1.pdf" />
+  </ItemGroup>
+  
   <ItemGroup>
     <PackageReference Include="Aspose.PDF" Version="21.3.0" />
     <PackageReference Include="Microsoft.Azure.ServiceBus" Version="5.1.2" />

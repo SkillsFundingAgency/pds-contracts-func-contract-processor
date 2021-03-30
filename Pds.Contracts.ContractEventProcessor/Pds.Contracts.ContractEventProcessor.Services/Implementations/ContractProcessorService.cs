@@ -6,6 +6,7 @@ using Pds.Contracts.Data.Api.Client.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
 {
@@ -219,15 +220,16 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
         }
 
         /// <inheritdoc/>
-        public string GetFolderNameForContractDocument(string fundingType, string period, string suffix)
+        public string GetFolderNameForContractDocument(string fundingTypeShortName, string period, string suffix)
         {
-            return $"{fundingType}-{period}-{suffix}";
+            return $"{fundingTypeShortName}-{period}-{suffix}";
         }
 
         /// <inheritdoc/>
         public string GetUrlSafeFolderNameForContractDocument(string folderName)
         {
-            folderName = folderName.Replace("-", string.Empty);
+            Regex pattern = new Regex("[-,+]");
+            folderName = pattern.Replace(folderName, string.Empty);
             return System.Web.HttpUtility.UrlPathEncode(folderName);
         }
     }
