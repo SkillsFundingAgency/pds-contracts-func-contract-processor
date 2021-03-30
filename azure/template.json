@@ -86,7 +86,7 @@
     "SharePointApiRelativeSiteUrl": {
       "type": "string"
     },
-    "SharepointApiPublicationFolderPrefix": {
+    "SharepointApiPublicationFolderSuffix": {
       "type": "string"
     }
   },
@@ -259,8 +259,8 @@
                 "value": "[parameters('SharePointApiRelativeSiteUrl')]"
               },
               {
-                "name": "SPClientServiceConfiguration:PublicationFolderPrefix",
-                "value": "[parameters('SharepointApiPublicationFolderPrefix')]"
+                "name": "SPClientServiceConfiguration:PublicationFolderSuffix",
+                "value": "[parameters('SharepointApiPublicationFolderSuffix')]"
               },
               {
                 "name": "SPClientServiceConfiguration:ShouldErrorPdfNotFound",
