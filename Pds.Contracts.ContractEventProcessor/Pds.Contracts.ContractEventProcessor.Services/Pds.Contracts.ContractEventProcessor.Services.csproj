@@ -8,7 +8,11 @@
   <ItemGroup>
     <None Remove="Pds.Contracts.ContractEventProcessor.Services.csproj.transform" />
   </ItemGroup>
-  
+
+	<ItemGroup>
+		<EmbeddedResource Include="DocumentServices\Resources\Aspose.Total.lic" />
+	</ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Aspose.PDF" Version="21.3.0" />
     <PackageReference Include="Microsoft.Azure.ServiceBus" Version="5.1.2" />

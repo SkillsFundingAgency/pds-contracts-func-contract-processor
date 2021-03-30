@@ -261,6 +261,10 @@
               {
                 "name": "SPClientServiceConfiguration:PublicationFolderPrefix",
                 "value": "[parameters('SharepointApiPublicationFolderPrefix')]"
+              },
+              {
+                "name": "SPClientServiceConfiguration:ShouldErrorPdfNotFound",
+                "value": "true"
               }
             ]
           }
