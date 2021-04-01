@@ -88,6 +88,21 @@
     },
     "SharepointApiPublicationFolderSuffix": {
       "type": "string"
+    },
+    "ContractApiBaseAddress": {
+      "type": "string"
+    },
+    "ContractApiTenantId": {
+      "type": "string"
+    },
+    "ContractApiClientId": {
+      "type": "string"
+    },
+    "ContractApiClientSecret": {
+      "type": "securestring"
+    },
+    "ContractApiAppUri": {
+      "type": "string"
     }
   },
   "variables": {
@@ -201,6 +216,34 @@
               {
                 "name": "ContractEventsSessionQueue",
                 "value": "[variables('ContractEventQueueName')]"
+              },
+              {
+                "name": "ContractsDataApiConfiguration:ApiBaseAddress",
+                "value": "[parameters('ContractApiBaseAddress')]"
+              },
+              {
+                "name": "ContractsDataApiConfiguration:Authority",
+                "value": "https://login.microsoftonline.com/"
+              },
+              {
+                "name": "ContractsDataApiConfiguration:TenantId",
+                "value": "[parameters('ContractApiTenantId')]"
+              },
+              {
+                "name": "ContractsDataApiConfiguration:ClientId",
+                "value": "[parameters('ContractApiClientId')]"
+              },
+              {
+                "name": "ContractsDataApiConfiguration:ClientSecret",
+                "value": "[parameters('ContractApiClientSecret')]"
+              },
+              {
+                "name": "ContractsDataApiConfiguration:AppUri",
+                "value": "[parameters('ContractApiAppUri')]"
+              },
+              {
+                "name": "ContractsDataApiConfiguration:ShouldSkipAuthentication",
+                "value": "false"
               },
               {
                 "name": "AuditApiClientConfiguration:ApiBaseAddress",
