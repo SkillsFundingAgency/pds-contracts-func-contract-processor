@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Pds.Contracts.ContractEventProcessor.Common.CustomExceptionHandlers;
-using Pds.Contracts.ContractEventProcessor.Common.Enums;
+using Pds.Contracts.ContractEventProcessor.Services.CustomExceptionHandlers;
 using Pds.Contracts.ContractEventProcessor.Services.Implementations;
 using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
 using Pds.Contracts.ContractEventProcessor.Services.Models;
 using Pds.Contracts.Data.Api.Client.Interfaces;
+using Pds.Contracts.Data.Api.Client.Models;
 using System;
 using System.Threading.Tasks;
 using ClientData = Pds.Contracts.Data.Api.Client;
@@ -20,43 +20,40 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
         private readonly IContractCreationService _mockContractCreationService
             = Mock.Of<IContractCreationService>(MockBehavior.Strict);
 
-        private readonly ILogger<IContractService> _mockContractServiceLogger
-                       = Mock.Of<ILogger<IContractService>>(MockBehavior.Strict);
+        private readonly IContractEventProcessorLogger<IContractService> _mockContractServiceLogger
+                = Mock.Of<IContractEventProcessorLogger<IContractService>>(MockBehavior.Strict);
 
         private readonly ILogger<IContractApprovalService> _mockContractApprovalServiceLogger
                 = Mock.Of<ILogger<IContractApprovalService>>(MockBehavior.Strict);
 
-        private readonly ILogger<IContractCreationService> _mockContractCreationServiceLogger
-        = Mock.Of<ILogger<IContractCreationService>>(MockBehavior.Strict);
+        private readonly ILogger<IContractWithdrawService> _mockContractWithdrawServiceLogger
+                = Mock.Of<ILogger<IContractWithdrawService>>(MockBehavior.Strict);
 
         private readonly IContractService _mockContractsService
            = Mock.Of<IContractService>(MockBehavior.Strict);
 
-        private readonly IContractApprovalService _mockContractsApprovalService
+        private readonly IContractApprovalService _mockContractApprovalService
            = Mock.Of<IContractApprovalService>(MockBehavior.Strict);
+
+        private readonly IContractWithdrawService _mockContractsWithdrawService
+           = Mock.Of<IContractWithdrawService>(MockBehavior.Strict);
 
         private readonly IContractsDataService _mockContractsDataService
            = Mock.Of<IContractsDataService>(MockBehavior.Strict);
 
-        private readonly IValidationService _mockValidationService
-           = Mock.Of<IValidationService>(MockBehavior.Strict);
-
         [TestMethod]
-        public void ProcessMessage_Creation_ReturnsExpectedResult()
+        [DataRow(ContractParentStatus.Approved, ContractStatus.Approved, ContractAmendmentType.None)]
+        public void ProcessMessage_Approved_ReturnsExpectedResult(ContractParentStatus parentStatus, ContractStatus contractStatus, ContractAmendmentType amendmentType)
         {
             // Arrange
-            ContractParentStatus parentStatus = ContractParentStatus.Approved;
-            ContractStatus contractStatus = ContractStatus.Approved;
-            ContractAmendmentType amendmentType = ContractAmendmentType.Notfication;
+            Mock.Get(_mockContractServiceLogger)
+                .Setup(l => l.LogInformation(It.IsAny<string>()));
+
             var dummyContractEvent = GetContractEvent(parentStatus, contractStatus, amendmentType);
-            ClientData.Models.Contract dummyContract = null;
+            ClientData.Models.Contract dummyContract = GetClientContract();
 
-            SetMockSetup_ServiceLogger(LogLevel.Information);
-
-            MockValidationService_ValidateStatus(ContractEventType.Creation, parentStatus, contractStatus, amendmentType);
-
-            Mock.Get(_mockContractCreationService)
-                .Setup(s => s.CreateAsync(It.IsAny<ContractEvent>()))
+            Mock.Get(_mockContractApprovalService)
+                .Setup(s => s.ApproveAsync(It.IsAny<ContractEvent>(), It.IsAny<Contract>()))
                 .ReturnsAsync(true)
                 .Verifiable();
 
@@ -65,39 +62,32 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
                .ReturnsAsync(dummyContract)
                .Verifiable();
 
-            var contractService = new ContractService(_mockContractServiceLogger, _mockContractsDataService, _mockContractsApprovalService, _mockValidationService, _mockContractCreationService);
-
+            var contractService = new ContractService(_mockContractServiceLogger, _mockContractsDataService, _mockContractApprovalService, _mockContractsWithdrawService, _mockContractCreationService);
 
             // Act
             contractService.ProcessMessage(dummyContractEvent).GetAwaiter().GetResult();
 
             // Assert
-            Mock.Get(_mockValidationService)
-                .Verify(d => d.GetContractEventType(It.IsAny<ContractEvent>()), Times.Once);
             Mock.Get(_mockContractsDataService)
                .Verify(s => s.TryGetContractAsync(It.IsAny<string>(), It.IsAny<int>()), Times.Once);
-            Mock.Get(_mockContractCreationService)
-              .Verify(s => s.CreateAsync(It.IsAny<ContractEvent>()), Times.Once);
             Mock.Get(_mockContractServiceLogger).VerifyAll();
         }
 
         [TestMethod]
-        public void ProcessMessage_Creation_ReturnsLogAndExitResult()
+        [DataRow(ContractParentStatus.Approved, ContractStatus.Approved, ContractAmendmentType.None)]
+        public void ProcessMessage_Approved_ReturnsLogAndExitResult(ContractParentStatus parentStatus, ContractStatus contractStatus, ContractAmendmentType amendmentType)
         {
             // Arrange
-            ContractParentStatus parentStatus = ContractParentStatus.Approved;
-            ContractStatus contractStatus = ContractStatus.Approved;
-            ContractAmendmentType amendmentType = ContractAmendmentType.Notfication;
             var dummyContractEvent = GetContractEvent(parentStatus, contractStatus, amendmentType);
-            var dummyContract = GetClientContract();
+            var dummyContract = default(Contract);
 
-            SetMockSetup_ServiceLogger(LogLevel.Information);
-            SetMockSetup_ServiceLogger(LogLevel.Warning);
+            Mock.Get(_mockContractServiceLogger)
+                .Setup(l => l.LogInformation(It.IsAny<string>()));
+            Mock.Get(_mockContractServiceLogger)
+                .Setup(l => l.LogWarning(It.IsAny<string>()));
 
-            MockValidationService_ValidateStatus(ContractEventType.Creation, parentStatus, contractStatus, amendmentType);
-
-            Mock.Get(_mockContractCreationService)
-                .Setup(s => s.CreateAsync(It.IsAny<ContractEvent>()))
+            Mock.Get(_mockContractApprovalService)
+                .Setup(s => s.ApproveAsync(It.IsAny<ContractEvent>(), It.IsAny<Contract>()))
                 .ReturnsAsync(true)
                 .Verifiable();
 
@@ -106,74 +96,53 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
                .ReturnsAsync(dummyContract)
                .Verifiable();
 
-            var contractService = new ContractService(_mockContractServiceLogger, _mockContractsDataService, _mockContractsApprovalService, _mockValidationService, _mockContractCreationService);
-
+            var contractService = new ContractService(_mockContractServiceLogger, _mockContractsDataService, _mockContractApprovalService, _mockContractsWithdrawService, _mockContractCreationService);
 
             // Act
             contractService.ProcessMessage(dummyContractEvent).GetAwaiter().GetResult();
 
             // Assert
-            Mock.Get(_mockValidationService)
-                .Verify(d => d.GetContractEventType(It.IsAny<ContractEvent>()), Times.Once);
             Mock.Get(_mockContractsDataService)
                .Verify(s => s.TryGetContractAsync(It.IsAny<string>(), It.IsAny<int>()), Times.Once);
-            Mock.Get(_mockContractCreationService)
-                .Verify(s => s.CreateAsync(It.IsAny<ContractEvent>()), Times.Never);
+            Mock.Get(_mockContractApprovalService)
+                .Verify(s => s.ApproveAsync(It.IsAny<ContractEvent>(), It.IsAny<Contract>()), Times.Never);
             Mock.Get(_mockContractServiceLogger).VerifyAll();
         }
 
         [TestMethod]
-        public void ProcessMessage_ThrowsException()
+        [DataRow(ContractParentStatus.Approved, ContractStatus.Replaced, ContractAmendmentType.None)]
+        public void ProcessMessage_ThrowsException(ContractParentStatus parentStatus, ContractStatus contractStatus, ContractAmendmentType amendmentType)
         {
             // Arrange
-            ContractParentStatus parentStatus = ContractParentStatus.Approved;
-            ContractStatus contractStatus = ContractStatus.Replaced;
-            ContractAmendmentType amendmentType = ContractAmendmentType.None;
             var dummyContractEvent = GetContractEvent(parentStatus, contractStatus, amendmentType);
+            Mock.Get(_mockContractServiceLogger)
+                .Setup(l => l.LogInformation(It.IsAny<string>()));
 
-            SetMockSetup_ServiceLogger(LogLevel.Information);
+            Mock.Get(_mockContractApprovalService)
+                .Setup(s => s.ApproveAsync(It.IsAny<ContractEvent>(), It.IsAny<Contract>()))
+                .Returns(It.IsAny<Task<bool>>())
+                .Verifiable();
 
-            //SetMockSetup_ServiceLogger(LogLevel.Warning);
-            MockValidationService_ValidateStatus_Exception(ContractEventType.Approval, parentStatus, contractStatus, amendmentType);
-
-            Mock.Get(_mockContractCreationService)
-                .Setup(s => s.CreateAsync(It.IsAny<ContractEvent>()))
-                .ReturnsAsync(true)
+            Mock.Get(_mockContractsWithdrawService)
+                .Setup(s => s.WithdrawAsync(It.IsAny<ContractEvent>(), It.IsAny<Contract>()))
+                .Returns(It.IsAny<Task<bool>>())
                 .Verifiable();
 
             // Act
-            var contractService = new ContractService(_mockContractServiceLogger, _mockContractsDataService, _mockContractsApprovalService, _mockValidationService, _mockContractCreationService);
+            var contractService = new ContractService(_mockContractServiceLogger, _mockContractsDataService, _mockContractApprovalService, _mockContractsWithdrawService, _mockContractCreationService);
             Func<Task> act = async () => await contractService.ProcessMessage(dummyContractEvent);
 
             // Assert
-            act.Should().Throw<ContractExpectationFailedException>();
+            act.Should().Throw<NotImplementedException>();
             Mock.Get(_mockContractServiceLogger).VerifyAll();
         }
 
-        private void MockValidationService_ValidateStatus(ContractEventType requiredEventType, ContractParentStatus parentStatus, ContractStatus contractStatus, ContractAmendmentType amendmentType)
+        private void MockContractsDataService_GetContractAsync(ClientData.Models.Contract contract)
         {
-            Mock.Get(_mockValidationService)
-                .Setup(x => x.GetContractEventType(It.IsAny<ContractEvent>()))
-                .Returns(requiredEventType)
+            Mock.Get(_mockContractsDataService)
+                .Setup(x => x.GetContractAsync(It.IsAny<string>(), It.IsAny<int>()))
+                .ReturnsAsync(contract)
                 .Verifiable();
-        }
-
-        private void MockValidationService_ValidateStatus_Exception(ContractEventType requiredEventType, ContractParentStatus parentStatus, ContractStatus contractStatus, ContractAmendmentType amendmentType)
-        {
-            Mock.Get(_mockValidationService)
-                .Setup(x => x.GetContractEventType(It.IsAny<ContractEvent>()))
-                .Throws(new ContractExpectationFailedException("anumber", 1, "anumber"))
-                .Verifiable();
-        }
-
-        private ClientData.Models.Contract GetClientContract()
-        {
-            return new ClientData.Models.Contract()
-            {
-                Id = 1,
-                ContractNumber = "ABC-0000",
-                ContractVersion = 1
-            };
         }
 
         private ContractEvent GetContractEvent(ContractParentStatus parentStatus, ContractStatus contractStatus, ContractAmendmentType amendmentType)
@@ -189,37 +158,14 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             };
         }
 
-        private void SetMockSetup_ServiceLogger(LogLevel logLevel)
+        private ClientData.Models.Contract GetClientContract()
         {
-            Mock.Get(_mockContractServiceLogger)
-            .Setup(logger => logger.Log(
-            It.Is<LogLevel>(l => l == logLevel),
-            It.IsAny<EventId>(),
-            It.IsAny<It.IsAnyType>(),
-            It.IsAny<Exception>(),
-            (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()));
-        }
-
-        private void SetMockSetup_ApprovalServiceLogger(LogLevel logLevel)
-        {
-            Mock.Get(_mockContractApprovalServiceLogger)
-            .Setup(logger => logger.Log(
-            It.Is<LogLevel>(l => l == logLevel),
-            It.IsAny<EventId>(),
-            It.IsAny<It.IsAnyType>(),
-            It.IsAny<Exception>(),
-            (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()));
-        }
-
-        private void SetMockSetup_CreationServiceLogger(LogLevel logLevel)
-        {
-            Mock.Get(_mockContractCreationServiceLogger)
-            .Setup(logger => logger.Log(
-            It.Is<LogLevel>(l => l == logLevel),
-            It.IsAny<EventId>(),
-            It.IsAny<It.IsAnyType>(),
-            It.IsAny<Exception>(),
-            (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()));
+            return new ClientData.Models.Contract()
+            {
+                Id = 1,
+                ContractNumber = "ABC-0000",
+                ContractVersion = 1
+            };
         }
     }
 }

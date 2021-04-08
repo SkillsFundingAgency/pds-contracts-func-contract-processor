@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using Pds.Contracts.ContractEventProcessor.Common.CustomExceptionHandlers;
-using Pds.Contracts.ContractEventProcessor.Common.Enums;
+﻿using Pds.Contracts.ContractEventProcessor.Services.Enums;
 using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
 using Pds.Contracts.ContractEventProcessor.Services.Models;
 using Pds.Contracts.Data.Api.Client.Interfaces;
+using System;
 using System.Threading.Tasks;
 
 namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
@@ -13,10 +12,10 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
     /// </summary>
     public class ContractService : IContractService
     {
-        private readonly ILogger<IContractService> _logger;
+        private readonly IContractEventProcessorLogger<IContractService> _logger;
         private readonly IContractsDataService _contractsDataService;
         private readonly IContractApprovalService _contractApprovalService;
-        private readonly IValidationService _validationService;
+        private readonly IContractWithdrawService _contractWithdrawService;
         private readonly IContractCreationService _contractCreationService;
 
         /// <summary>
@@ -26,18 +25,19 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
         /// <param name="contractsDataService">The contracts data service.</param>
         /// <param name="contractApprovalService">The contract approval service.</param>
         /// <param name="validationService">The validation service.</param>
+        /// <param name="contractWithdrawService">The contract withdraw service.</param>
         /// <param name="contractCreationService">The contract creation service.</param>
         public ContractService(
-            ILogger<IContractService> logger,
+            IContractEventProcessorLogger<IContractService> logger,
             IContractsDataService contractsDataService,
             IContractApprovalService contractApprovalService,
-            IValidationService validationService,
+            IContractWithdrawService contractWithdrawService,
             IContractCreationService contractCreationService)
         {
             _logger = logger;
             _contractsDataService = contractsDataService;
             _contractApprovalService = contractApprovalService;
-            _validationService = validationService;
+            _contractWithdrawService = contractWithdrawService;
             _contractCreationService = contractCreationService;
         }
 
@@ -46,36 +46,40 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
         {
             _logger.LogInformation($"[{nameof(ProcessMessage)}] Processing message for contract event : {contractEvent.BookmarkId}");
 
-            var eventType = _validationService.GetContractEventType(contractEvent);
-
+            var eventType = contractEvent.GetContractEventType();
             var contract = await _contractsDataService.TryGetContractAsync(contractEvent.ContractNumber, contractEvent.ContractVersion);
-
             switch (eventType)
             {
-                case ContractEventType.Creation:
-                    if (contract != null)
-                    {
-                        _logger.LogWarning($"Contract with contract number [{contract.ContractNumber}], version [{contract.ContractVersion}] and Id [{contract.Id}] already exists.");
-                    }
-                    else
+                case ContractEventType.Create:
+                    if (contract is null)
                     {
                         await _contractCreationService.CreateAsync(contractEvent);
                     }
+                    else
+                    {
+                        _logger.LogWarning($"[{nameof(ContractEventProcessor)}] - Ignoring contract event with id [{contractEvent.BookmarkId}] because a contract with contract number [{contract.ContractNumber}], version [{contract.ContractVersion}] and Id [{contract.Id}] already exists.");
+                    }
 
                     break;
-                case ContractEventType.Approval:
+
+                case ContractEventType.Approve:
                     if (contract is null)
                     {
-                        _logger.LogWarning($"Unable to find contract with contract number [{contract.ContractNumber}], version [{contract.ContractVersion}] and Id [{contract.Id}]");
+                        _logger.LogWarning($"[{nameof(ContractEventProcessor)}] - Ignoring contract event with id [{contractEvent.BookmarkId}] because unable to find a contract with contract number [{contractEvent.ContractNumber}], version [{contractEvent.ContractVersion}].");
                     }
                     else
                     {
-                        await _contractApprovalService.Approve(contractEvent);
+                        await _contractApprovalService.ApproveAsync(contractEvent, contract);
                     }
 
                     break;
-                default:
+
+                case ContractEventType.Withdraw:
+                    await _contractWithdrawService.WithdrawAsync(contractEvent, contract);
                     break;
+
+                default:
+                    throw new NotImplementedException($"[{nameof(ContractService)}] - [{nameof(ProcessMessage)}] does not have an implementation for event type [{eventType}].");
             }
         }
     }

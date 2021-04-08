@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Pds.Contracts.ContractEventProcessor.Common.Enums
+namespace Pds.Contracts.ContractEventProcessor.Services.Models
 {
     /// <summary>
     /// Represents the states a contract can be in.

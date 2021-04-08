@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Pds.Contracts.ContractEventProcessor.Services.DocumentServices
+﻿namespace Pds.Contracts.ContractEventProcessor.Services.DocumentServices
 {
     /// <summary>
     /// Api for manipulating and getting information from spreadsheets.

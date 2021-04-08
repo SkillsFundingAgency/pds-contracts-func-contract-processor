@@ -8,7 +8,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Interfaces
     /// <summary>
     /// The Contract Processor Service.
     /// </summary>
-    public interface IContractProcessorService
+    public interface IContractEventMapper
     {
         /// <summary>
         /// Create Contract Title.
@@ -20,11 +20,11 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Interfaces
         /// <summary>
         /// Change Period from 1516 to "2015 to 2016".
         /// </summary>
-        /// <param name="periodValue">Period value.</param>
-        /// <param name="startDate">The contract start date.</param>
-        /// <param name="endDate">The contract end date.</param>
-        /// <returns>Returns a formatted period.</returns>
-        string FormatPeriod(string periodValue, DateTime? startDate = null, DateTime? endDate = null);
+        /// <param name="contractEvent">The contract event.</param>
+        /// <returns>
+        /// Returns a formatted period.
+        /// </returns>
+        string FormatPeriod(ContractEvent contractEvent);
 
         /// <summary>
         /// GetContractContent - Get the contract pdf file from the Sharepoint.
@@ -62,9 +62,9 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Interfaces
         /// </summary>
         /// <param name="fundingTypeShortName">The contract funding type short name attributes.</param>
         /// <param name="period">The period.</param>
-        /// <param name="sufFix">The suffix text to be added at the end.</param>
+        /// <param name="suffix">The suffix text to be added at the end.</param>
         /// <returns>Returns sharepoint document title text.</returns>
-        string GetFolderNameForContractDocument(string fundingTypeShortName, string period, string sufFix);
+        string GetFolderNameForContractDocument(string fundingTypeShortName, string period, string suffix);
 
         /// <summary>
         /// Get user friendly Year.

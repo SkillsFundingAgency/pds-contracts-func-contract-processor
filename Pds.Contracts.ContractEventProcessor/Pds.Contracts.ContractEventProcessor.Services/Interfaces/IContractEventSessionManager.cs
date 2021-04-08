@@ -1,8 +1,5 @@
 ﻿using Microsoft.Azure.ServiceBus;
 using Pds.Contracts.ContractEventProcessor.Services.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Pds.Contracts.ContractEventProcessor.Services.Interfaces

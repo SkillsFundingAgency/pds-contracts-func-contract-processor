@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.Azure.ServiceBus;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -9,6 +10,7 @@ using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
 using Pds.Contracts.ContractEventProcessor.Services.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,7 +27,10 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             var dummyMessage = GetDummyMessage();
 
             var mockSession = Mock.Of<IMessageSession>(MockBehavior.Strict);
-            var mockLogger = Mock.Of<ILogger<IContractEventSessionManager>>(MockBehavior.Strict);
+            var mockLogger = Mock.Of<IContractEventProcessorLogger<IContractEventSessionManager>>(MockBehavior.Strict);
+            var mockProcessLog = Mock.Of<IContractEventProcessLog>(MockBehavior.Strict);
+            Mock.Get(mockProcessLog)
+                .Setup(c => c.Initialise(It.IsAny<Message>(), It.IsAny<ContractEvent>()));
             var mockContractService = Mock.Of<IContractService>(MockBehavior.Strict);
             Mock.Get(mockContractService)
                 .Setup(c => c.ProcessMessage(It.IsAny<ContractEvent>()))
@@ -39,13 +44,14 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
                 .Verifiable();
 
             // Act
-            var sessionManager = new ContractEventSessionManager(mockStateManager, mockContractService, mockLogger);
+            var sessionManager = new ContractEventSessionManager(mockStateManager, mockContractService, mockLogger, GetConfiguration(), mockProcessLog);
             var actual = await sessionManager.ProcessSessionMessageAsync(mockSession, dummyMessage);
 
             // Assert
             actual.Should().Be(expected);
             Mock.Get(mockContractService).Verify();
             Mock.Get(mockStateManager).Verify();
+            Mock.Get(mockProcessLog).VerifyAll();
         }
 
         [TestMethod]
@@ -77,7 +83,13 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
                 .Returns("session-id")
                 .Verifiable();
 
-            var mockLogger = Mock.Of<ILogger<IContractEventSessionManager>>(MockBehavior.Strict);
+            var mockLogger = Mock.Of<IContractEventProcessorLogger<IContractEventSessionManager>>(MockBehavior.Strict);
+            Mock.Get(mockLogger)
+                .Setup(l => l.LogWarning(It.IsAny<string>()));
+
+            var mockProcessLog = Mock.Of<IContractEventProcessLog>(MockBehavior.Strict);
+            Mock.Get(mockProcessLog)
+                .Setup(c => c.Initialise(It.IsAny<Message>(), It.IsAny<ContractEvent>()));
             var mockContractService = Mock.Of<IContractService>(MockBehavior.Strict);
             var mockStateManager = Mock.Of<IWorkflowStateManager>(MockBehavior.Strict);
             Mock.Get(mockStateManager)
@@ -91,7 +103,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
                 .Verifiable();
 
             // Act
-            var sessionManager = new ContractEventSessionManager(mockStateManager, mockContractService, mockLogger);
+            var sessionManager = new ContractEventSessionManager(mockStateManager, mockContractService, mockLogger, GetConfiguration(), mockProcessLog);
             var actual = await sessionManager.ProcessSessionMessageAsync(mockSession, dummyMessage);
 
             // Assert
@@ -116,7 +128,10 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
 
             var expectedState = new SessionWorkflowState();
             var mockSession = Mock.Of<IMessageSession>(MockBehavior.Strict);
-            var mockLogger = Mock.Of<ILogger<IContractEventSessionManager>>(MockBehavior.Strict);
+            var mockLogger = Mock.Of<IContractEventProcessorLogger<IContractEventSessionManager>>(MockBehavior.Strict);
+            var mockProcessLog = Mock.Of<IContractEventProcessLog>(MockBehavior.Strict);
+            Mock.Get(mockProcessLog)
+                .Setup(c => c.Initialise(It.IsAny<Message>(), It.IsAny<ContractEvent>()));
             var mockContractService = Mock.Of<IContractService>(MockBehavior.Strict);
             Mock.Get(mockContractService)
                 .Setup(c => c.ProcessMessage(It.IsAny<ContractEvent>()))
@@ -135,7 +150,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
                 .Verifiable();
 
             // Act
-            var sessionManager = new ContractEventSessionManager(mockStateManager, mockContractService, mockLogger);
+            var sessionManager = new ContractEventSessionManager(mockStateManager, mockContractService, mockLogger, GetConfiguration(), mockProcessLog);
             var actual = await sessionManager.ProcessSessionMessageAsync(mockSession, dummyMessage);
 
             // Assert
@@ -153,7 +168,10 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             var dummyMessage = GetDummyMessage(expectedBodyMessage);
             var initialState = new SessionWorkflowState();
             var mockSession = Mock.Of<IMessageSession>(MockBehavior.Strict);
-            var mockLogger = Mock.Of<ILogger<IContractEventSessionManager>>(MockBehavior.Strict);
+            var mockLogger = Mock.Of<IContractEventProcessorLogger<IContractEventSessionManager>>(MockBehavior.Strict);
+            var mockProcessLog = Mock.Of<IContractEventProcessLog>(MockBehavior.Strict);
+            Mock.Get(mockProcessLog)
+                .Setup(c => c.Initialise(It.IsAny<Message>(), It.IsAny<ContractEvent>()));
             var mockContractService = Mock.Of<IContractService>(MockBehavior.Strict);
             Mock.Get(mockContractService)
                 .Setup(c => c.ProcessMessage(expectedBodyMessage))
@@ -166,7 +184,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
                 .Verifiable();
 
             // Act
-            var sessionManager = new ContractEventSessionManager(mockStateManager, mockContractService, mockLogger);
+            var sessionManager = new ContractEventSessionManager(mockStateManager, mockContractService, mockLogger, GetConfiguration(), mockProcessLog);
             Func<Task<SessionWorkflowState>> act = async () => await sessionManager.ProcessSessionMessageAsync(mockSession, dummyMessage);
 
             // Assert
@@ -189,10 +207,14 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
                 .Returns("session-id")
                 .Verifiable();
 
-            var mockLogger = Mock.Of<ILogger<IContractEventSessionManager>>(MockBehavior.Strict);
+            var mockLogger = Mock.Of<IContractEventProcessorLogger<IContractEventSessionManager>>(MockBehavior.Strict);
             Mock.Get(mockLogger)
-                .Setup(l => l.Log(LogLevel.Information, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), null, It.IsAny<Func<It.IsAnyType, Exception, string>>()))
+                .Setup(l => l.LogWarning(It.IsAny<string>()))
                 .Verifiable();
+
+            var mockProcessLog = Mock.Of<IContractEventProcessLog>(MockBehavior.Strict);
+            Mock.Get(mockProcessLog)
+                .Setup(c => c.Initialise(It.IsAny<Message>(), It.IsAny<ContractEvent>()));
 
             var mockContractService = Mock.Of<IContractService>(MockBehavior.Strict);
             Mock.Get(mockContractService)
@@ -211,7 +233,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
                 .Verifiable();
 
             // Act
-            var sessionManager = new ContractEventSessionManager(mockStateManager, mockContractService, mockLogger);
+            var sessionManager = new ContractEventSessionManager(mockStateManager, mockContractService, mockLogger, GetConfiguration(), mockProcessLog);
             Func<Task<SessionWorkflowState>> act = async () => await sessionManager.ProcessSessionMessageAsync(mockSession, dummyMessage);
 
             // Assert
@@ -239,6 +261,11 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             typeof(Message.SystemPropertiesCollection).GetProperty(nameof(systemProperties.LockedUntilUtc)).SetValue(systemProperties, DateTime.Now);
             typeof(Message).GetProperty(nameof(dummyMessage.SystemProperties)).SetValue(dummyMessage, systemProperties);
             return dummyMessage;
+        }
+
+        private IFunctionSettings GetConfiguration()
+        {
+            return new FunctionSettings() { MaximumDeliveryCount = 9 };
         }
     }
 }

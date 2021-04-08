@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Pds.Contracts.ContractEventProcessor.Common.Enums
+namespace Pds.Contracts.ContractEventProcessor.Services.Models
 {
     /// <summary>
     /// Defines the amendment type of the contract.
@@ -20,7 +20,7 @@ namespace Pds.Contracts.ContractEventProcessor.Common.Enums
         /// Represents a contract change where the contract was approved automatically.
         /// </summary>
         [Display(Name = "Notification")]
-        Notfication = 1,
+        Notification = 1,
 
         /// <summary>
         /// Represents a contract change where the contract was changed but still needs approval from the provider it belongs too.

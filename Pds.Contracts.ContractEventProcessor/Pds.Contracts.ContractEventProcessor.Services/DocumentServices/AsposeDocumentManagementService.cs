@@ -1,6 +1,6 @@
 ﻿using Aspose.Pdf;
-using Microsoft.Extensions.Logging;
 using Pds.Contracts.ContractEventProcessor.Services.Extensions;
+using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
 using System.Diagnostics;
 using System.IO;
 
@@ -11,13 +11,13 @@ namespace Pds.Contracts.ContractEventProcessor.Services.DocumentServices
     /// </summary>
     public class AsposeDocumentManagementService : IDocumentManagementService
     {
-        private readonly ILogger<AsposeDocumentManagementService> _logger;
+        private readonly IContractEventProcessorLogger<AsposeDocumentManagementService> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AsposeDocumentManagementService"/> class.
         /// </summary>
         /// <param name="logger">The logger.</param>
-        public AsposeDocumentManagementService(ILogger<AsposeDocumentManagementService> logger)
+        public AsposeDocumentManagementService(IContractEventProcessorLogger<AsposeDocumentManagementService> logger)
         {
             _logger = logger;
         }
@@ -51,7 +51,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.DocumentServices
             }
         }
 
-        #endregion
+        #endregion IDocumentManagementService Implementation
 
 
         #region Addition Helpers
@@ -71,7 +71,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.DocumentServices
             }
         }
 
-        #endregion
-
+        #endregion Addition Helpers
     }
 }

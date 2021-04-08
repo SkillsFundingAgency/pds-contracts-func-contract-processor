@@ -4,15 +4,13 @@ using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Moq.Protected;
-using Pds.Contracts.ContractEventProcessor.Common.CustomExceptionHandlers;
 using Pds.Contracts.ContractEventProcessor.Services.Configurations;
+using Pds.Contracts.ContractEventProcessor.Services.CustomExceptionHandlers;
 using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
 using Pds.Contracts.ContractEventProcessor.Services.SharePointClient;
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,15 +19,14 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
     [TestClass, TestCategory("Unit")]
     public class SPAuthenticationTokenServiceTests
     {
-        private readonly ILogger<ISharePointClientService> _mockLogger
-          = Mock.Of<ILogger<ISharePointClientService>>(MockBehavior.Strict);
+        private readonly IContractEventProcessorLogger<ISharePointClientService> _mockLogger
+          = Mock.Of<IContractEventProcessorLogger<ISharePointClientService>>(MockBehavior.Strict);
 
         private readonly IOptions<SPClientServiceConfiguration> _mockSPClientServiceConfiguration
             = Mock.Of<IOptions<SPClientServiceConfiguration>>(MockBehavior.Strict);
 
         private readonly HttpClient _mockHttpClient
             = Mock.Of<HttpClient>(MockBehavior.Strict);
-
 
         [TestMethod]
         public async Task AcquireSPTokenAsync_ExpectedResult()
@@ -54,7 +51,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             var spAuthenticationTokenService = new SPAuthenticationTokenService(httpClient, _mockSPClientServiceConfiguration, _mockLogger);
 
             //Act
-            var retrievedPosts = await spAuthenticationTokenService.AcquireSPTokenAsync();
+            await spAuthenticationTokenService.AcquireSPTokenAsync();
 
             //Assert
             handlerMock.Protected().Verify(
@@ -104,7 +101,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             Mock.Get(_mockLogger).VerifyAll();
         }
 
-
         private void SetMockSetup_AcquireSPTokenAsync()
         {
             // new StringContent(It.IsAny<string>(), Encoding.UTF8, "application/x-www-form-urlencoded")
@@ -119,15 +115,24 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
 
         private void SetMockSetup_Logger(LogLevel logLevel)
         {
-            Mock.Get(_mockLogger)
-            .Setup(logger => logger.Log(
-            It.Is<LogLevel>(l => l == logLevel),
-            It.IsAny<EventId>(),
-            It.IsAny<It.IsAnyType>(),
-            It.IsAny<Exception>(),
-            (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()));
-        }
+            switch (logLevel)
+            {
+                case LogLevel.Information:
+                    Mock.Get(_mockLogger).Setup(logger => logger.LogInformation(It.IsAny<string>()));
+                    break;
 
+                case LogLevel.Warning:
+                    Mock.Get(_mockLogger).Setup(logger => logger.LogWarning(It.IsAny<string>()));
+                    break;
+
+                case LogLevel.Error:
+                    Mock.Get(_mockLogger).Setup(logger => logger.LogError(It.IsAny<Exception>(), It.IsAny<string>()));
+                    break;
+
+                default:
+                    break;
+            }
+        }
 
         private SPClientServiceConfiguration GetSPClientServiceConfiguration()
         {

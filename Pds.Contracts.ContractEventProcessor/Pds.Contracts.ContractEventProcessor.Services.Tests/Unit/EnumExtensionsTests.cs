@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Pds.Contracts.ContractEventProcessor.Common.Enums;
+using Pds.Contracts.ContractEventProcessor.Services.Enums;
 using Pds.Contracts.ContractEventProcessor.Services.Extensions;
 
 namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit

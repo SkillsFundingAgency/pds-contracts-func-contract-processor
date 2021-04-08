@@ -1,8 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.SharePoint.Client;
-using Pds.Contracts.ContractEventProcessor.Common.CustomExceptionHandlers;
 using Pds.Contracts.ContractEventProcessor.Services.Configurations;
+using Pds.Contracts.ContractEventProcessor.Services.CustomExceptionHandlers;
 using Pds.Contracts.ContractEventProcessor.Services.Extensions;
 using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
 using System;
@@ -25,9 +24,9 @@ namespace Pds.Contracts.ContractEventProcessor.Services.SharePointClient
         /// </value>
         internal static string EmbededResourcesNamespace => "Pds.Contracts.ContractEventProcessor.Services.DocumentServices.Resources.ContractPdf";
 
-        private static string TestContractPdfFileName => $"{EmbededResourcesNamespace}12345678_Test_v1.pdf";
+        private static string TestContractPdfFileName => $"{EmbededResourcesNamespace}.12345678_Test_v1.pdf";
 
-        private readonly ILogger<ISharePointClientService> _logger;
+        private readonly IContractEventProcessorLogger<ISharePointClientService> _logger;
         private readonly ClientContext _clientContext;
         private readonly SPClientServiceConfiguration _spConfig;
 
@@ -38,7 +37,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.SharePointClient
         /// <param name="clientContext">The SharePoint Client Context.</param>
         /// <param name="spClientServiceConfiguration">The SharePoint Client Service configuration.</param>
         public SharePointClientService(
-            ILogger<ISharePointClientService> logger,
+            IContractEventProcessorLogger<ISharePointClientService> logger,
             ClientContext clientContext,
             IOptions<SPClientServiceConfiguration> spClientServiceConfiguration)
         {
@@ -59,7 +58,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.SharePointClient
 
             string fileRelativeUrl = $"{_spConfig.RelativeSiteURL}/{libraryName}/{filename}";
 
-            //SaveFileToLocal();
             try
             {
                 var file = _clientContext.Web.GetFileByServerRelativeUrl(fileRelativeUrl);
@@ -82,7 +80,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.SharePointClient
                 _logger.LogInformation($"[{nameof(GetDocument)}] - File stream location: {fileRelativeUrl} completed.");
                 return stream.Value.ToByteArray();
             }
-            catch (ServerException ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"[{nameof(GetDocument)}] - The contract pdf file is not accessible. File: {fileRelativeUrl}");
                 return HandleFileNotFoundExceptionWithTestPdf(new DocumentNotAccessibleException("The contract pdf file is not accessible.", ex));

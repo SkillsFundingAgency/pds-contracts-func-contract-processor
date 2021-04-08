@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
-namespace Pds.Contracts.ContractEventProcessor.Common.CustomExceptionHandlers
+namespace Pds.Contracts.ContractEventProcessor.Services.CustomExceptionHandlers
 {
     /// <summary>
     /// Api client token acquisition failure exception.

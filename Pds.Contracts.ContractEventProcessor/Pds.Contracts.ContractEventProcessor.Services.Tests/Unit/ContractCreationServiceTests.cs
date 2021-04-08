@@ -3,19 +3,17 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Pds.Contracts.ContractEventProcessor.Common.CustomExceptionHandlers;
-using Pds.Contracts.ContractEventProcessor.Common.Enums;
 using Pds.Contracts.ContractEventProcessor.Services.Configurations;
+using Pds.Contracts.ContractEventProcessor.Services.CustomExceptionHandlers;
 using Pds.Contracts.ContractEventProcessor.Services.DocumentServices;
+using Pds.Contracts.ContractEventProcessor.Services.Enums;
 using Pds.Contracts.ContractEventProcessor.Services.Implementations;
 using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
 using Pds.Contracts.ContractEventProcessor.Services.Models;
 using Pds.Contracts.Data.Api.Client.Interfaces;
 using Pds.Contracts.Data.Api.Client.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
@@ -23,8 +21,8 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
     [TestClass, TestCategory("Unit")]
     public class ContractCreationServiceTests
     {
-        private readonly ILogger<IContractCreationService> _mockLogger
-           = Mock.Of<ILogger<IContractCreationService>>(MockBehavior.Strict);
+        private readonly IContractEventProcessorLogger<IContractCreationService> _mockLogger
+           = Mock.Of<IContractEventProcessorLogger<IContractCreationService>>(MockBehavior.Strict);
 
         private readonly IContractsDataService _mockContractsDataService
            = Mock.Of<IContractsDataService>(MockBehavior.Strict);
@@ -35,8 +33,8 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
         private readonly IDocumentManagementService _mockDocumentManagementService
            = Mock.Of<IDocumentManagementService>(MockBehavior.Strict);
 
-        private readonly IContractProcessorService _mockContractProcessorService
-            = Mock.Of<IContractProcessorService>(MockBehavior.Strict);
+        private readonly IContractEventMapper _mockContractProcessorService
+            = Mock.Of<IContractEventMapper>(MockBehavior.Strict);
 
         private readonly IOptions<SPClientServiceConfiguration> _mockSPClientServiceConfiguration
             = Mock.Of<IOptions<SPClientServiceConfiguration>>(MockBehavior.Strict);
@@ -51,7 +49,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             SetMockSetup_SharePointClientService(dummyPdf);
             SetMockSetup_Create(dummyContractEvent);
             var contractCreationService = GetContractCreationService();
-
 
             //Act
             var result = await contractCreationService.CreateAsync(dummyContractEvent);
@@ -136,7 +133,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             Mock.Get(_mockLogger).VerifyAll();
         }
 
-
         private ContractCreationService GetContractCreationService()
         {
             return new ContractCreationService(_mockLogger, _mockContractsDataService, _mockSharePointClientService, _mockDocumentManagementService, _mockContractProcessorService, _mockSPClientServiceConfiguration);
@@ -206,13 +202,23 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
 
         private void SetMockSetup_Logger(LogLevel logLevel)
         {
-            Mock.Get(_mockLogger)
-            .Setup(logger => logger.Log(
-            It.Is<LogLevel>(l => l == logLevel),
-            It.IsAny<EventId>(),
-            It.IsAny<It.IsAnyType>(),
-            It.IsAny<Exception>(),
-            (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()));
+            switch (logLevel)
+            {
+                case LogLevel.Information:
+                    Mock.Get(_mockLogger).Setup(logger => logger.LogInformation(It.IsAny<string>()));
+                    break;
+
+                case LogLevel.Warning:
+                    Mock.Get(_mockLogger).Setup(logger => logger.LogWarning(It.IsAny<string>()));
+                    break;
+
+                case LogLevel.Error:
+                    Mock.Get(_mockLogger).Setup(logger => logger.LogError(It.IsAny<string>()));
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         private ContractEvent GetContractEvent()
@@ -223,7 +229,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             contractEvent.ContractAllocations = Enumerable.Repeat(0, 2).Select(h =>
                     new ContractAllocation { FundingStreamPeriodCode = $"Test{h}", ContractAllocationNumber = "TestAllocNo", LEPArea = "TestLEP", TenderSpecTitle = "TestSpec" }).ToArray();
             contractEvent.ContractNumber = "Levy-0001";
-            contractEvent.ContractType = ContractType.TwentyFourPlusAdvancedLearningLoanEoi.ToString();
+            contractEvent.Type = ContractType.TwentyFourPlusAdvancedLearningLoanEoi.ToString();
             contractEvent.ContractVersion = 1;
             contractEvent.EndDate = DateTime.Now.AddMonths(36);
             contractEvent.FundingType = ContractFundingType.Levy;

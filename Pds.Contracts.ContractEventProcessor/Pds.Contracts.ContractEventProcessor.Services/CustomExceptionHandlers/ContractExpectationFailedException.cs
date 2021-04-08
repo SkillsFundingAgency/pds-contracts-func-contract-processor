@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Pds.Contracts.ContractEventProcessor.Common.CustomExceptionHandlers
+namespace Pds.Contracts.ContractEventProcessor.Services.CustomExceptionHandlers
 {
     /// <summary>
     /// Contract expectation failed exception.

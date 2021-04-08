@@ -1,4 +1,4 @@
-﻿namespace Pds.Contracts.ContractEventProcessor.Common.Enums
+﻿namespace Pds.Contracts.ContractEventProcessor.Services.Enums
 {
     /// <summary>
     /// Contract Event Type.
@@ -13,16 +13,16 @@
         /// <summary>
         /// Contract creation event.
         /// </summary>
-        Creation,
+        Create,
 
         /// <summary>
         /// Contract approval event.
         /// </summary>
-        Approval,
+        Approve,
 
         /// <summary>
-        /// Contract manual approval event.
+        /// Contract withdraw event.
         /// </summary>
-        ManualApproval
+        Withdraw
     }
 }

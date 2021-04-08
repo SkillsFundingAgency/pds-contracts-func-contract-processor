@@ -1,30 +1,30 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Pds.Contracts.ContractEventProcessor.Common.CustomExceptionHandlers
+namespace Pds.Contracts.ContractEventProcessor.Services.CustomExceptionHandlers
 {
     /// <summary>
-    /// Document not accessible exception.
+    /// Document not found exception.
     /// <seealso cref="Exception"/>.
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public class DocumentNotAccessibleException : Exception
+    public class DocumentNotFoundException : Exception
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentNotAccessibleException"/> class.
+        /// Initializes a new instance of the <see cref="DocumentNotFoundException"/> class.
         /// </summary>
         /// <param name="message">The error message.</param>
-        public DocumentNotAccessibleException(string message)
+        public DocumentNotFoundException(string message)
             : base(message)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentNotAccessibleException"/> class.
+        /// Initializes a new instance of the <see cref="DocumentNotFoundException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public DocumentNotAccessibleException(string message, Exception innerException)
+        public DocumentNotFoundException(string message, Exception innerException)
             : base(message, innerException)
         {
         }

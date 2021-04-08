@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Pds.Contracts.ContractEventProcessor.Common.Enums;
+using Pds.Contracts.ContractEventProcessor.Services.CustomExceptionHandlers;
+using Pds.Contracts.ContractEventProcessor.Services.Enums;
 using Pds.Contracts.ContractEventProcessor.Services.Extensions;
 using Pds.Contracts.ContractEventProcessor.Services.Implementations;
 using Pds.Contracts.ContractEventProcessor.Services.Models;
@@ -99,8 +100,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
 
             //Assert
             result.Should().NotBeNull();
-
-            //result.Should().Be("ESFA apprenticeship agreement March 2021 version 1");
             result.Should().Be(expectedTitle);
         }
 
@@ -118,7 +117,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             Action act = () => contractProcessorService.CreateContractTitle(dummyContractEvent);
 
             //Assert
-            act.Should().Throw<ArgumentOutOfRangeException>();
+            act.Should().Throw<NotImplementedException>();
         }
 
         #endregion CreateContractTitle Tests
@@ -134,7 +133,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             var contractProcessorService = GetContractProcessorService();
 
             //Act
-            var result = contractProcessorService.FormatPeriod(dummyContractEvent.ContractPeriodValue, dummyContractEvent.StartDate, dummyContractEvent.EndDate);
+            var result = contractProcessorService.FormatPeriod(dummyContractEvent);
 
             //Assert
             result.Should().NotBeNull();
@@ -173,7 +172,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             var contractProcessorService = GetContractProcessorService();
 
             //Act
-            var result = contractProcessorService.FormatPeriod(periodValue, startDate, endDate);
+            var result = contractProcessorService.FormatPeriod(new ContractEvent { ContractPeriodValue = periodValue, StartDate = startDate, EndDate = endDate });
 
             //Assert
             result.Should().NotBeNull();
@@ -189,10 +188,10 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             var contractProcessorService = GetContractProcessorService();
 
             //Act
-            Action act = () => contractProcessorService.FormatPeriod(dummyContractEvent.ContractPeriodValue, dummyContractEvent.StartDate, dummyContractEvent.EndDate);
+            Action act = () => contractProcessorService.FormatPeriod(dummyContractEvent);
 
             //Assert
-            act.Should().Throw<ArgumentOutOfRangeException>();
+            act.Should().Throw<ContractEventExpectationFailedException>();
         }
 
         #endregion FormatPeriod tests
@@ -380,9 +379,9 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
 
         #region Test Helpers
 
-        private ContractProcessorService GetContractProcessorService()
+        private ContractEventMapper GetContractProcessorService()
         {
-            return new ContractProcessorService();
+            return new ContractEventMapper();
         }
 
         private ContractEvent GetContractEvent()
@@ -393,7 +392,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             contractEvent.ContractAllocations = Enumerable.Repeat(0, 2).Select(h =>
                     new ContractAllocation { FundingStreamPeriodCode = $"Test{h}", ContractAllocationNumber = $"TestAllocNo{h}", LEPArea = "Test LEP Area", TenderSpecTitle = "Test tender spec title" }).ToArray();
             contractEvent.ContractNumber = "Levy-0001";
-            contractEvent.ContractType = ContractType.TwentyFourPlusAdvancedLearningLoanEoi.ToString();
+            contractEvent.Type = ContractType.TwentyFourPlusAdvancedLearningLoanEoi.GetEnumDisplayName();
             contractEvent.ContractVersion = 1;
             contractEvent.EndDate = DateTime.Now.AddMonths(36);
             contractEvent.FundingType = ContractFundingType.Levy;

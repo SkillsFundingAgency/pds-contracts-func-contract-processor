@@ -1,4 +1,5 @@
-﻿using Pds.Contracts.ContractEventProcessor.Common.Enums;
+﻿using Pds.Contracts.ContractEventProcessor.Services.CustomExceptionHandlers;
+using Pds.Contracts.ContractEventProcessor.Services.Enums;
 using Pds.Contracts.ContractEventProcessor.Services.Extensions;
 using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
 using Pds.Contracts.ContractEventProcessor.Services.Models;
@@ -11,7 +12,7 @@ using System.Text.RegularExpressions;
 namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
 {
     /// <inheritdoc/>
-    public class ContractProcessorService : IContractProcessorService
+    public class ContractEventMapper : IContractEventMapper
     {
         /// <summary>
         /// Organization Name Abbreviated.
@@ -26,28 +27,39 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
         /// <inheritdoc/>
         public CreateRequest GetCreateRequest(ContractEvent contractEvent)
         {
-            string contractTitle = CreateContractTitle(contractEvent);
+            try
+            {
+                string contractTitle = CreateContractTitle(contractEvent);
 
-            var createRequest = new CreateRequest();
-            createRequest.AmendmentType = (Data.Api.Client.Enumerations.ContractAmendmentType)contractEvent.AmendmentType;
-            createRequest.ContractFundingStreamPeriodCodes = GetContractFundingStreamPeriodCodes(contractEvent.ContractAllocations);
-            createRequest.ContractNumber = contractEvent.ContractNumber;
-            createRequest.Year = FormatPeriod(contractEvent.ContractPeriodValue, contractEvent.StartDate, contractEvent.EndDate);
-            createRequest.Type = (Data.Api.Client.Enumerations.ContractType)Enum.Parse(typeof(ContractType), contractEvent.ContractType);
-            createRequest.ContractVersion = contractEvent.ContractVersion;
-            createRequest.EndDate = contractEvent.EndDate;
-            createRequest.FundingType = (Data.Api.Client.Enumerations.ContractFundingType)contractEvent.FundingType;
-            createRequest.ParentContractNumber = contractEvent.ParentContractNumber;
-            createRequest.StartDate = contractEvent.StartDate;
-            createRequest.UKPRN = contractEvent.UKPRN;
-            createRequest.Value = contractEvent.Value;
-            createRequest.ContractData = contractEvent.ContractEventXml;
-            createRequest.Title = contractTitle;
-            createRequest.ContractAllocationNumber = contractEvent.ContractAllocations.First().ContractAllocationNumber;
-            createRequest.CreatedBy = CreatedBy;
-            createRequest.PageCount = 0;
-            createRequest.SignedOn = contractEvent.SignedOn;
-            return createRequest;
+                var createRequest = new CreateRequest();
+                createRequest.AmendmentType = (Data.Api.Client.Enumerations.ContractAmendmentType)contractEvent.AmendmentType;
+                createRequest.ContractFundingStreamPeriodCodes = GetContractFundingStreamPeriodCodes(contractEvent.ContractAllocations);
+                createRequest.ContractNumber = contractEvent.ContractNumber;
+                createRequest.Year = FormatPeriod(contractEvent);
+                createRequest.Type = GetContractType(contractEvent);
+                createRequest.ContractVersion = contractEvent.ContractVersion;
+                createRequest.EndDate = contractEvent.EndDate;
+                createRequest.FundingType = (Data.Api.Client.Enumerations.ContractFundingType)contractEvent.FundingType;
+                createRequest.ParentContractNumber = contractEvent.ParentContractNumber;
+                createRequest.StartDate = contractEvent.StartDate;
+                createRequest.UKPRN = contractEvent.UKPRN;
+                createRequest.Value = contractEvent.Value;
+                createRequest.ContractData = contractEvent.ContractEventXml;
+                createRequest.Title = contractTitle;
+                createRequest.ContractAllocationNumber = contractEvent.ContractAllocations.First().ContractAllocationNumber;
+                createRequest.CreatedBy = CreatedBy;
+                createRequest.PageCount = 0;
+                createRequest.SignedOn = contractEvent.SignedOn;
+                return createRequest;
+            }
+            catch (ContractEventExpectationFailedException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new ContractEventExpectationFailedException(contractEvent.BookmarkId, contractEvent.ContractNumber, contractEvent.ContractVersion, $"Unhandled exception trying to parse contract event message, see inner exception for details.", ex);
+            }
         }
 
         /// <inheritdoc/>
@@ -73,7 +85,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                 variation = "variation ";
             }
 
-            var contractPeriod = FormatPeriod(contractEvent.ContractPeriodValue, contractEvent.StartDate, contractEvent.EndDate);
+            var contractPeriod = FormatPeriod(contractEvent);
 
             switch (fundingType)
             {
@@ -133,16 +145,20 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                     return $"{fundingTypeName} {variation}for {contractPeriod} version {contractEvent.ContractVersion}";
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(fundingType));
+                    throw new NotImplementedException($"Title for {nameof(fundingType)} with value {fundingType} is not implemented.");
             }
         }
 
         /// <inheritdoc/>
-        public string FormatPeriod(string periodValue, DateTime? startDate = null, DateTime? endDate = null)
+        public string FormatPeriod(ContractEvent contractEvent)
         {
+            string periodValue = contractEvent.ContractPeriodValue;
+            DateTime? startDate = contractEvent.StartDate;
+            DateTime? endDate = contractEvent.EndDate;
+
             if (periodValue.Length != 4)
             {
-                throw new ArgumentOutOfRangeException();
+                throw new ContractEventExpectationFailedException(contractEvent.BookmarkId, contractEvent.ContractNumber, contractEvent.ContractVersion, $"{nameof(contractEvent.ContractPeriodValue)} has invalid value [{contractEvent.ContractPeriodValue}]");
             }
 
             var startsWith20 = periodValue.Substring(0, 2) == "20";
@@ -176,7 +192,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
         {
             if (periodValue.Length != 4)
             {
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(periodValue));
             }
 
             return int.Parse(periodValue.Substring(0, 2));
@@ -187,7 +203,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
         {
             if (year.Length < 2)
             {
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(year));
             }
 
             if (year.Length == 4)
@@ -200,7 +216,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                 return year;
             }
 
-            throw new ArgumentOutOfRangeException();
+            throw new ArgumentOutOfRangeException(nameof(year));
         }
 
         /// <inheritdoc/>
@@ -231,6 +247,20 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
             Regex pattern = new Regex("[-,+]");
             folderName = pattern.Replace(folderName, string.Empty);
             return System.Web.HttpUtility.UrlPathEncode(folderName);
+        }
+
+        private static Data.Api.Client.Enumerations.ContractType GetContractType(ContractEvent contractEvent)
+        {
+            var contractTypes = Enum.GetValues(typeof(Enums.ContractType)).Cast<Enums.ContractType>();
+            var contractDisplayNames = Enum.GetValues(typeof(Enums.ContractType)).Cast<Enums.ContractType>().Select(e => e.GetEnumDisplayName());
+            if (contractDisplayNames.Any(d => contractEvent.Type.Equals(d, StringComparison.OrdinalIgnoreCase)))
+            {
+                return (Data.Api.Client.Enumerations.ContractType)contractTypes.Single(e => e.GetEnumDisplayName().Equals(contractEvent.Type, StringComparison.OrdinalIgnoreCase));
+            }
+            else
+            {
+                throw new ContractEventExpectationFailedException(contractEvent.BookmarkId, contractEvent.ContractNumber, contractEvent.ContractVersion, $"{nameof(contractEvent.Type)} has invalid value [{contractEvent.Type}] expected one of [{string.Join(",", contractDisplayNames)}].");
+            }
         }
     }
 }

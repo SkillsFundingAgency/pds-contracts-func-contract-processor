@@ -5,6 +5,7 @@ using Moq;
 using Newtonsoft.Json;
 using Pds.Contracts.ContractEventProcessor.Services.Implementations;
 using Pds.Contracts.ContractEventProcessor.Services.Models;
+using System;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,7 +18,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
         public async Task GetWorkflowStateAsync_ReturnsExpectedResultTest()
         {
             // Arrange
-            var expected = new SessionWorkflowState { LastMessageSeqNumber = 1 };
+            var expected = new SessionWorkflowState { FailedMessageId = "test" };
             var stateBytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(expected));
             var mockSession = Mock.Of<IMessageSession>(MockBehavior.Strict);
             Mock.Get(mockSession)
@@ -81,7 +82,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
         public async Task SetWorkflowStateAsync_SetsExpectedSessionStateTest()
         {
             // Arrange
-            var state = new SessionWorkflowState { LastMessageSeqNumber = 1 };
+            var state = new SessionWorkflowState { FailedMessageId = "test" };
             var expected = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(state));
             var mockSession = Mock.Of<IMessageSession>(MockBehavior.Strict);
             Mock.Get(mockSession)

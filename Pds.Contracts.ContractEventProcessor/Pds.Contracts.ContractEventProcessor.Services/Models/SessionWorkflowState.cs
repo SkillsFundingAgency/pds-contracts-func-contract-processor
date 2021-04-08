@@ -24,20 +24,12 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Models
         public string FailedMessageId { get; set; }
 
         /// <summary>
-        /// Gets or sets the last message seq number.
-        /// </summary>
-        /// <value>
-        /// The last message seq number.
-        /// </value>
-        public int LastMessageSeqNumber { get; set; }
-
-        /// <summary>
         /// Gets or sets the processed messages.
         /// </summary>
         /// <value>
         /// The processed messages.
         /// </value>
-        public List<string> ProcessedMessages { get; set; } = new List<string>();
+        public string FailedMessageReason { get; set; }
 
         /// <summary>
         /// Gets or sets the postponed messages.

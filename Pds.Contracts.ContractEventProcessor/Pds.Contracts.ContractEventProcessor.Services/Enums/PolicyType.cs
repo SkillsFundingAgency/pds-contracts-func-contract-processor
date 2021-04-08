@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Pds.Contracts.ContractEventProcessor.Common.Enums
+﻿namespace Pds.Contracts.ContractEventProcessor.Services.Enums
 {
     /// <summary>
     /// Http transient fault handing policy.

@@ -1,7 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Pds.Contracts.ContractEventProcessor.Common.CustomExceptionHandlers;
+﻿using Microsoft.Extensions.Options;
 using Pds.Contracts.ContractEventProcessor.Services.Configurations;
+using Pds.Contracts.ContractEventProcessor.Services.CustomExceptionHandlers;
 using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -19,7 +18,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.SharePointClient
     {
         private readonly HttpClient _httpClient;
         private readonly SPClientServiceConfiguration _spConfig;
-        private readonly ILogger<ISharePointClientService> _logger;
+        private readonly IContractEventProcessorLogger<ISharePointClientService> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SPAuthenticationTokenService"/> class.
@@ -30,7 +29,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.SharePointClient
         public SPAuthenticationTokenService(
             HttpClient httpClient,
             IOptions<SPClientServiceConfiguration> spClientServiceConfiguration,
-            ILogger<ISharePointClientService> logger)
+            IContractEventProcessorLogger<ISharePointClientService> logger)
         {
             _httpClient = httpClient;
             _spConfig = spClientServiceConfiguration.Value;

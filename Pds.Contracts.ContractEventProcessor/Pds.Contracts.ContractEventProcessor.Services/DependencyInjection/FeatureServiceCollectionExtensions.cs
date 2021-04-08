@@ -6,8 +6,6 @@ using Pds.Contracts.ContractEventProcessor.Services.Implementations;
 using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
 using Pds.Contracts.ContractEventProcessor.Services.SharePointClient;
 using Pds.Contracts.Data.Api.Client.Registrations;
-using Pds.Core.ApiClient.Interfaces;
-using Pds.Core.ApiClient.Services;
 
 namespace Pds.Contracts.ContractEventProcessor.Services.DependencyInjection
 {
@@ -24,21 +22,36 @@ namespace Pds.Contracts.ContractEventProcessor.Services.DependencyInjection
         /// <returns>A reference to this instance after the operation has completed.</returns>
         public static IServiceCollection AddFeatureServices(this IServiceCollection services, IConfiguration configuration)
         {
+            // Register config
+            services.AddSingleton(s => FunctionSettingsHelper.GetSettings(configuration));
+
+            // Register contract data api client
+            var policyRegistry = services.AddPolicyRegistry();
+            services.AddContractsDataApiClient(configuration, policyRegistry);
+
+            // Register event processor workflow
             services.AddScoped<IContractEventSessionManager, ContractEventSessionManager>();
             services.AddSingleton<IWorkflowStateManager, WorkflowStateManager>();
             services.AddScoped<IContractService, ContractService>();
-            services.AddSingleton<IValidationService, ValidationService>();
-            services.AddSingleton<IContractApprovalService, ContractApprovalService>();
 
-            var policyRegistry = services.AddPolicyRegistry();
-            services.AddContractsDataApiClient(configuration, policyRegistry);
+            // Register custom logger
+            services.AddScoped<IContractEventProcessLog, ContractEventProcessLog>();
+            services.AddScoped(typeof(IContractEventProcessorLogger<>), typeof(ContractEventProcessorLogger<>));
+
+            // Register contract event services
+            services.AddScoped<IContractCreationService, ContractCreationService>();
+            services.AddScoped<IContractApprovalService, ContractApprovalService>();
+            services.AddScoped<IContractWithdrawService, ContractWithdrawService>();
+
+            // Register sharepoint related services
             services.Configure<SPClientServiceConfiguration>(options => configuration.GetSection(nameof(SPClientServiceConfiguration)).Bind(options));
             services.AddSharePointClientContext();
-            services.AddScoped<IContractCreationService, ContractCreationService>();
             services.AddScoped<ISharePointClientService, SharePointClientService>();
-            services.AddSingleton<IContractProcessorService, ContractProcessorService>();
+            services.AddSingleton<IContractEventMapper, ContractEventMapper>();
+
+            // Register pdf contract document related services
             services.AddAsposeLicense();
-            services.AddSingleton<IDocumentManagementService, AsposeDocumentManagementService>();
+            services.AddScoped<IDocumentManagementService, AsposeDocumentManagementService>();
 
             return services;
         }

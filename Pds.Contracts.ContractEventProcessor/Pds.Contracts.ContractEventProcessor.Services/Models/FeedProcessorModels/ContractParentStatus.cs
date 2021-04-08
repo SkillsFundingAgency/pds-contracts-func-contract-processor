@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Converters;
 using System.Text.Json.Serialization;
 
-namespace Pds.Contracts.ContractEventProcessor.Common.Enums
+namespace Pds.Contracts.ContractEventProcessor.Services.Models
 {
     /// <summary>
     /// Represents the states for a contract parent.

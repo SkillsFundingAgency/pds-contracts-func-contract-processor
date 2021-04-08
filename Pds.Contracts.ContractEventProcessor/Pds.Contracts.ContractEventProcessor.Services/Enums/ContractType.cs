@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Pds.Contracts.ContractEventProcessor.Common.Enums
+namespace Pds.Contracts.ContractEventProcessor.Services.Enums
 {
     /// <summary>
     /// The types of contract that the system supports.

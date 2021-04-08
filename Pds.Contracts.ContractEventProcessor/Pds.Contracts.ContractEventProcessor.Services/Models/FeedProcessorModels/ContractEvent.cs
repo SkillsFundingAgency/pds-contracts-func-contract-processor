@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json.Converters;
-using Pds.Contracts.ContractEventProcessor.Common.Enums;
+using Pds.Contracts.ContractEventProcessor.Services.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
@@ -39,6 +39,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Models
         /// <summary>
         /// Gets or sets the contract status.
         /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
         public ContractStatus Status { get; set; }
 
         /// <summary>
@@ -77,7 +78,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Models
         /// <summary>
         /// Gets or sets the contract type.
         /// </summary>
-        public string ContractType { get; set; }
+        public string Type { get; set; }
 
         /// <summary>
         /// Gets or sets the contract allocations collection.
