@@ -89,6 +89,10 @@
     "SharepointApiPublicationFolderSuffix": {
       "type": "string"
     },
+    "SharepointApiResource": {
+      "type": "string",
+      "defaultValue": "00000003-0000-0ff1-ce00-000000000000"
+    },
     "ContractApiBaseAddress": {
       "type": "string"
     },
@@ -296,6 +300,10 @@
               {
                 "name": "SPClientServiceConfiguration:AppUri",
                 "value": "[parameters('SharepointApiAppUri')]"
+              },
+              {
+                "name": "SPClientServiceConfiguration:Resource",
+                "value": "[parameters('SharepointApiResource')]"
               },
               {
                 "name": "SPClientServiceConfiguration:RelativeSiteURL",
