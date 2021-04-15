@@ -46,7 +46,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                 createRequest.Value = contractEvent.Value;
                 createRequest.ContractData = contractEvent.ContractEventXml;
                 createRequest.Title = contractTitle;
-                createRequest.ContractAllocationNumber = contractEvent.ContractAllocations.First().ContractAllocationNumber;
+                createRequest.ContractAllocationNumber = contractEvent.ContractAllocations?.FirstOrDefault()?.ContractAllocationNumber;
                 createRequest.CreatedBy = CreatedBy;
                 createRequest.PageCount = 0;
                 createRequest.SignedOn = contractEvent.SignedOn;
@@ -180,11 +180,18 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
         /// <inheritdoc/>
         public CreateContractCode[] GetContractFundingStreamPeriodCodes(IEnumerable<ContractAllocation> contractAllocations)
         {
-            return contractAllocations
-                    .Select(a => a.FundingStreamPeriodCode)
-                    .Distinct()
-                    .Select(c => new CreateContractCode { Code = c })
-                    .ToArray();
+            if (contractAllocations != null &&
+                contractAllocations.Any(p => p.FundingStreamPeriodCode != null))
+            {
+                return contractAllocations
+                        .Select(a => a.FundingStreamPeriodCode)
+                        .Distinct()
+                        .Select(c => new CreateContractCode { Code = c })
+                        .ToArray();
+            }
+
+            // TODO : Empty array or null?
+            return new CreateContractCode[0];
         }
 
         /// <inheritdoc/>

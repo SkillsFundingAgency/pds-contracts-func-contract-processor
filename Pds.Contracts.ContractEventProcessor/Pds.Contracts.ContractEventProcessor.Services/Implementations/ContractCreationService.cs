@@ -57,12 +57,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
         {
             _logger.LogInformation($"[{nameof(CreateAsync)}] - Processing message for contract creation. ContractNumber: {contractEvent.ContractNumber}, ContractVersion: {contractEvent.ContractVersion}");
 
-            if (!contractEvent?.ContractAllocations?.Any() ?? true)
-            {
-                _logger.LogError($"[{nameof(CreateAsync)}] - Contract allocation not found. ContractNumber: {contractEvent.ContractNumber}, ContractVersion: {contractEvent.ContractVersion}");
-                throw new ContractEventExpectationFailedException(contractEvent.BookmarkId, contractEvent.ContractNumber, contractEvent.ContractVersion, "Contract allocation not found.");
-            }
-
             var createRequest = _contractEventMapper.GetCreateRequest(contractEvent);
             var fileName = _contractEventMapper.GetFileNameForContractDocument(contractEvent.UKPRN, contractEvent.ContractNumber, contractEvent.ContractVersion);
             var folderName = _contractEventMapper.GetFolderNameForContractDocument(contractEvent.FundingType.GetEnumShortName(), contractEvent.ContractPeriodValue, _spConfig.PublicationFolderSuffix);

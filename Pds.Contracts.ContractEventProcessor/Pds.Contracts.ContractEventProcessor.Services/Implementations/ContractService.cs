@@ -47,35 +47,37 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
             _logger.LogInformation($"[{nameof(ProcessMessage)}] Processing message for contract event : {contractEvent.BookmarkId}");
 
             var eventType = contractEvent.GetContractEventType();
-            var contract = await _contractsDataService.TryGetContractAsync(contractEvent.ContractNumber, contractEvent.ContractVersion);
             switch (eventType)
             {
                 case ContractEventType.Create:
-                    if (contract is null)
+                    var existingContract = await _contractsDataService.TryGetContractAsync(contractEvent.ContractNumber, contractEvent.ContractVersion);
+                    if (existingContract is null)
                     {
                         await _contractCreationService.CreateAsync(contractEvent);
                     }
                     else
                     {
-                        _logger.LogWarning($"[{nameof(ContractEventProcessor)}] - Ignoring contract event with id [{contractEvent.BookmarkId}] because a contract with contract number [{contract.ContractNumber}], version [{contract.ContractVersion}] and Id [{contract.Id}] already exists.");
+                        _logger.LogWarning($"[{nameof(ContractEventProcessor)}] - Ignoring contract event with id [{contractEvent.BookmarkId}] because a contract with contract number [{contractEvent.ContractNumber}], version [{contractEvent.ContractVersion}] and Id [{existingContract.Id}] already exists.");
                     }
 
                     break;
 
                 case ContractEventType.Approve:
-                    if (contract is null)
+                    var approveContract = await _contractsDataService.TryGetContractAsync(contractEvent.ContractNumber, contractEvent.ContractVersion);
+                    if (approveContract is null)
                     {
                         _logger.LogWarning($"[{nameof(ContractEventProcessor)}] - Ignoring contract event with id [{contractEvent.BookmarkId}] because unable to find a contract with contract number [{contractEvent.ContractNumber}], version [{contractEvent.ContractVersion}].");
                     }
                     else
                     {
-                        await _contractApprovalService.ApproveAsync(contractEvent, contract);
+                        await _contractApprovalService.ApproveAsync(contractEvent, approveContract);
                     }
 
                     break;
 
                 case ContractEventType.Withdraw:
-                    await _contractWithdrawService.WithdrawAsync(contractEvent, contract);
+                    await _contractWithdrawService.WithdrawAsync(contractEvent);
+
                     break;
 
                 default:

@@ -27,13 +27,12 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
         }
 
         /// <inheritdoc/>
-        public async Task<bool> WithdrawAsync(ContractEvent contractEvent, Contract contract)
+        public async Task<bool> WithdrawAsync(ContractEvent contractEvent)
         {
             var withdrawRequest = new WithdrawalRequest()
             {
-                ContractNumber = contract.ContractNumber,
-                ContractVersion = contract.ContractVersion,
-                Id = contract.Id,
+                ContractNumber = contractEvent.ContractNumber,
+                ContractVersion = contractEvent.ContractVersion,
                 FileName = contractEvent.ContractEventXml,
                 WithdrawalType = (ClientEnums.ContractStatus)contractEvent.Status
             };

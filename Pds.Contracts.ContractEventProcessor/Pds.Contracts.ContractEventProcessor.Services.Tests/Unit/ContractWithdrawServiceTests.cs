@@ -57,7 +57,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             var service = new ContractWithdrawService(_mockContractWithdrawServiceLogger, _mockContractsDataService);
 
             //Act
-            service.WithdrawAsync(contractEvent, contract).GetAwaiter().GetResult();
+            service.WithdrawAsync(contractEvent).GetAwaiter().GetResult();
 
             //Assert
             Mock.Get(_mockContractsDataService)

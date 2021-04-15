@@ -124,7 +124,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
                 .Verifiable();
 
             Mock.Get(_mockContractsWithdrawService)
-                .Setup(s => s.WithdrawAsync(It.IsAny<ContractEvent>(), It.IsAny<Contract>()))
+                .Setup(s => s.WithdrawAsync(It.IsAny<ContractEvent>()))
                 .Returns(It.IsAny<Task<bool>>())
                 .Verifiable();
 
@@ -135,6 +135,39 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             // Assert
             act.Should().Throw<NotImplementedException>();
             Mock.Get(_mockContractServiceLogger).VerifyAll();
+        }
+
+        [TestMethod]
+        [DataRow(ContractParentStatus.Withdrawn, ContractStatus.WithdrawnByAgency, ContractAmendmentType.None)]
+        [DataRow(ContractParentStatus.Withdrawn, ContractStatus.WithdrawnByAgency, ContractAmendmentType.Variation)]
+        [DataRow(ContractParentStatus.Withdrawn, ContractStatus.WithdrawnByProvider, ContractAmendmentType.None)]
+        [DataRow(ContractParentStatus.Withdrawn, ContractStatus.WithdrawnByProvider, ContractAmendmentType.Variation)]
+        public void ProcessMessage_WhenWithdrawEventType_RequestsWithdrawl(ContractParentStatus parentStatus, ContractStatus contractStatus, ContractAmendmentType amendmentType)
+        {
+            // Arrange
+            var dummyContractEvent = GetContractEvent(parentStatus, contractStatus, amendmentType);
+
+            Mock.Get(_mockContractServiceLogger)
+                .Setup(l => l.LogInformation(It.IsAny<string>()));
+
+            Mock.Get(_mockContractsWithdrawService)
+                .Setup(s => s.WithdrawAsync(It.IsAny<ContractEvent>()))
+                .ReturnsAsync(true)
+                .Verifiable();
+
+            var contractService = new ContractService(_mockContractServiceLogger, _mockContractsDataService, _mockContractApprovalService, _mockContractsWithdrawService, _mockContractCreationService);
+
+            // Act
+            Func<Task> act = async () => await contractService.ProcessMessage(dummyContractEvent);
+
+            // Assert
+            act.Should().NotThrow();
+
+            Mock.Get(_mockContractsWithdrawService)
+                .Verify(s => s.WithdrawAsync(It.IsAny<ContractEvent>()), Times.Once);
+            Mock.Get(_mockContractServiceLogger).VerifyAll();
+            Mock.Get(_mockContractApprovalService).VerifyAll();
+            Mock.Get(_mockContractsDataService).VerifyAll();
         }
 
         private void MockContractsDataService_GetContractAsync(ClientData.Models.Contract contract)

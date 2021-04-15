@@ -68,30 +68,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
         }
 
         [TestMethod]
-        public void Create_Expected_ContractEventExpectationFailedException()
-        {
-            //Arrange
-            ContractEvent dummyContractEvent = GetContractEvent();
-            dummyContractEvent.ContractAllocations = null;
-            var dummyPdf = GetPdf_Byte();
-            SetMockSetup_SharePointClientService(dummyPdf);
-            SetMockSetup_Logger(LogLevel.Information);
-            SetMockSetup_Logger(LogLevel.Error);
-            SetMockSetup_Create(dummyContractEvent);
-            var contractCreationService = GetContractCreationService();
-
-            //Act
-            Func<Task> act = async () => await contractCreationService.CreateAsync(dummyContractEvent);
-
-            //Assert
-            act.Should().Throw<ContractEventExpectationFailedException>();
-            Mock.Get(_mockSharePointClientService).Verify(x => x.GetDocument(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-            Mock.Get(_mockDocumentManagementService).Verify(x => x.ConvertToPdfA(It.IsAny<byte[]>()), Times.Never);
-            Mock.Get(_mockContractsDataService).Verify(x => x.CreateContractAsync(It.IsAny<CreateRequest>()), Times.Never);
-            Mock.Get(_mockLogger).VerifyAll();
-        }
-
-        [TestMethod]
         public void Create_Expected_DocumentNotFoundException()
         {
             //Arrange
