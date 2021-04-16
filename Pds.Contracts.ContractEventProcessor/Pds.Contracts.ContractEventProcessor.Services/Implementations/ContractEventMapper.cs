@@ -190,8 +190,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                         .ToArray();
             }
 
-            // TODO : Empty array or null?
-            return new CreateContractCode[0];
+            return Array.Empty<CreateContractCode>();
         }
 
         /// <inheritdoc/>
@@ -259,15 +258,10 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
         private static Data.Api.Client.Enumerations.ContractType GetContractType(ContractEvent contractEvent)
         {
             var contractTypes = Enum.GetValues(typeof(Enums.ContractType)).Cast<Enums.ContractType>();
-            var contractDisplayNames = Enum.GetValues(typeof(Enums.ContractType)).Cast<Enums.ContractType>().Select(e => e.GetEnumDisplayName());
-            if (contractDisplayNames.Any(d => contractEvent.Type.Equals(d, StringComparison.OrdinalIgnoreCase)))
-            {
-                return (Data.Api.Client.Enumerations.ContractType)contractTypes.Single(e => e.GetEnumDisplayName().Equals(contractEvent.Type, StringComparison.OrdinalIgnoreCase));
-            }
-            else
-            {
-                throw new ContractEventExpectationFailedException(contractEvent.BookmarkId, contractEvent.ContractNumber, contractEvent.ContractVersion, $"{nameof(contractEvent.Type)} has invalid value [{contractEvent.Type}] expected one of [{string.Join(",", contractDisplayNames)}].");
-            }
+
+            //SigleOrDefault is a workaround for known issue with ContractType enumeration used by MyESF and is added here for backward compatibility only, many feed types are not supported.
+            //This field is not used in MyESF and should be considered for decommissioning in the future contracts database design.
+            return (Data.Api.Client.Enumerations.ContractType)contractTypes.SingleOrDefault(e => e.GetEnumDisplayName().Equals(contractEvent.Type, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

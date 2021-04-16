@@ -5,6 +5,7 @@ using Pds.Contracts.ContractEventProcessor.Services.Enums;
 using Pds.Contracts.ContractEventProcessor.Services.Extensions;
 using Pds.Contracts.ContractEventProcessor.Services.Implementations;
 using Pds.Contracts.ContractEventProcessor.Services.Models;
+using Pds.Contracts.Data.Api.Client.Models;
 using System;
 using System.Linq;
 
@@ -26,14 +27,29 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             var result = contractProcessorService.GetCreateRequest(dummyContractEvent);
 
             //Assert
-            result.Should().NotBeNull();
-            result.ContractFundingStreamPeriodCodes.Length.Should().Be(1);
-            result.ContractAllocationNumber.Should().Be("TestAllocNo0");
-            result.Year.Should().Be("2017 to 2099");
+            result.Should().BeEquivalentTo(ExpectedCreateRequest());
+        }
+
+        [TestMethod]
+        public void GetCreateRequest_ReturnsDefaultContractType()
+        {
+            //Arrange
+            ContractEvent dummyContractEvent = GetContractEvent();
+            dummyContractEvent.Type = "Not a valid type";
+
+            var expectedResult = ExpectedCreateRequest();
+            expectedResult.Type = Data.Api.Client.Enumerations.ContractType.ConditionsOfFundingGrant;
+
+            var contractProcessorService = GetContractProcessorService();
+
+            //Act
+            var result = contractProcessorService.GetCreateRequest(dummyContractEvent);
+
+            //Assert
+            result.Should().BeEquivalentTo(expectedResult);
         }
 
         #endregion GetCreateRequest tests
-
 
         #region CreateContractTitle Tests
 
@@ -122,7 +138,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
 
         #endregion CreateContractTitle Tests
 
-
         #region FormatPeriod tests
 
         [TestMethod]
@@ -196,7 +211,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
 
         #endregion FormatPeriod tests
 
-
         #region GetContractFundingStreamPeriodCodes tests
 
         [TestMethod]
@@ -216,7 +230,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
 
         #endregion GetContractFundingStreamPeriodCodes tests
 
-
         #region GetStartingYear tests
 
         [TestMethod]
@@ -235,7 +248,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
 
         #endregion GetStartingYear tests
 
-
         #region GetStartingYear tests
 
         [TestMethod]
@@ -252,8 +264,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             act.Should().Throw<ArgumentOutOfRangeException>();
         }
 
-        #endregion  GetStartingYear tests
-
+        #endregion GetStartingYear tests
 
         #region GetFriendlyYear tests
 
@@ -274,7 +285,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
 
         #endregion GetFriendlyYear tests
 
-
         #region GetFriendlyYear tests
 
         [TestMethod]
@@ -294,7 +304,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
 
         #endregion GetFriendlyYear tests
 
-
         #region GetContractContent tests
 
         [TestMethod]
@@ -311,7 +320,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
         }
 
         #endregion GetContractContent tests
-
 
         #region GetFileNameForContractDocument tests
 
@@ -333,7 +341,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
 
         #endregion GetFileNameForContractDocument tests
 
-
         #region GetFolderNameForContractDocument tests
 
         [TestMethod]
@@ -354,7 +361,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
 
         #endregion GetFolderNameForContractDocument tests
 
-
         #region GetUrlSafeFolderNameForContractDocument tests
 
         [TestMethod]
@@ -374,8 +380,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             result.Should().Be(expected);
         }
 
-        #endregion  GetUrlSafeFolderNameForContractDocument tests
-
+        #endregion GetUrlSafeFolderNameForContractDocument tests
 
         #region Test Helpers
 
@@ -394,16 +399,44 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
             contractEvent.ContractNumber = "Levy-0001";
             contractEvent.Type = ContractType.TwentyFourPlusAdvancedLearningLoanEoi.GetEnumDisplayName();
             contractEvent.ContractVersion = 1;
-            contractEvent.EndDate = DateTime.Now.AddMonths(36);
+            contractEvent.EndDate = new DateTime(2021, 4, 1).AddMonths(36);
             contractEvent.FundingType = ContractFundingType.Levy;
             contractEvent.ParentContractNumber = "Test123";
-            contractEvent.StartDate = DateTime.Now;
+            contractEvent.StartDate = new DateTime(2021, 4, 1);
             contractEvent.UKPRN = 12345678;
             contractEvent.Value = 99999;
             contractEvent.ContractEventXml = "sample-blob-file.xml";
             contractEvent.ContractPeriodValue = "1799";
             contractEvent.BookmarkId = Guid.NewGuid();
             return contractEvent;
+        }
+
+        private CreateRequest ExpectedCreateRequest()
+        {
+            return new CreateRequest
+            {
+                AmendmentType = Data.Api.Client.Enumerations.ContractAmendmentType.Variation,
+                ContractFundingStreamPeriodCodes = new[]
+               {
+                   new CreateContractCode { Code = "Test0" },
+               },
+                ContractNumber = "Levy-0001",
+                Year = "2017 to 2099",
+                Type = Data.Api.Client.Enumerations.ContractType.TwentyFourPlusAdvancedLearningLoanEoi,
+                ContractVersion = 1,
+                EndDate = new DateTime(2021, 4, 1).AddMonths(36),
+                FundingType = Data.Api.Client.Enumerations.ContractFundingType.Levy,
+                ParentContractNumber = "Test123",
+                StartDate = new DateTime(2021, 4, 1),
+                UKPRN = 12345678,
+                Value = 99999,
+                ContractData = "sample-blob-file.xml",
+                Title = "ESFA apprenticeship agreement April 2021 version 1",
+                ContractAllocationNumber = "TestAllocNo0",
+                CreatedBy = "Feed-ContractEventProcessor",
+                PageCount = 0,
+                SignedOn = null
+            };
         }
 
         private byte[] GetPdf_Byte()
@@ -427,6 +460,5 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
         }
 
         #endregion Test Helpers
-
     }
 }
