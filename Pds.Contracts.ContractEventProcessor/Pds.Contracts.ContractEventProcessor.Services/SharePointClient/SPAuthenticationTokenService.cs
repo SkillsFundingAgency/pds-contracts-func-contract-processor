@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Pds.Contracts.ContractEventProcessor.Services.SharePointClient
 {
@@ -40,29 +41,27 @@ namespace Pds.Contracts.ContractEventProcessor.Services.SharePointClient
         public async Task<string> AcquireSPTokenAsync()
         {
             Uri site = new Uri($"{_spConfig.ApiBaseAddress}{_spConfig.RelativeSiteURL}");
-
-            var body = "grant_type=client_credentials" +
+            var cleanAccessRequestContent = "grant_type=client_credentials" +
                 $"&resource={_spConfig.Resource}/{site.DnsSafeHost}@{_spConfig.TenantId}" +
-                $"&client_id={_spConfig.ClientId}@{_spConfig.TenantId}" +
-                $"&client_secret={_spConfig.ClientSecret}";
+                $"&client_id={_spConfig.ClientId}@{_spConfig.TenantId}";
+
+            var body = cleanAccessRequestContent +
+                $"&client_secret={HttpUtility.UrlEncode(_spConfig.ClientSecret)}";
 
             using (var stringContent = new StringContent(body, Encoding.UTF8, "application/x-www-form-urlencoded"))
             {
-                _logger.LogInformation($"[{nameof(AcquireSPTokenAsync)}] - Attempting to get token from the SharePoint account access control. Site: {site.AbsoluteUri}");
+                var sharepointAadEndpoint = $"{_spConfig.Authority}{_spConfig.TenantId}/tokens/OAuth/2";
+                _logger.LogInformation($"[{nameof(AcquireSPTokenAsync)}] - Attempting to get token from the SharePoint account access control [{sharepointAadEndpoint}] with access request [{cleanAccessRequestContent}]. For site: {site.AbsoluteUri}");
 
-                var result = await _httpClient.PostAsync($"{_spConfig.Authority}{_spConfig.TenantId}/tokens/OAuth/2", stringContent)
-                    .ContinueWith((response) =>
-                    {
-                        return response.Result.Content.ReadAsStringAsync().Result;
-                    })
-                    .ConfigureAwait(false);
-
-                if (result == null)
+                var result = await _httpClient.PostAsync(sharepointAadEndpoint, stringContent);
+                var resultContent = await result.Content.ReadAsStringAsync();
+                if (!result.IsSuccessStatusCode)
                 {
-                    throw new SPTokenAcquisitionFailureException("Access token cannot be acquired for the SharePoint AAD Auth.");
+                    _logger.LogError($"[{nameof(AcquireSPTokenAsync)}] - Failed to get access token with status code [{result.StatusCode}] and reponse message [{resultContent}]");
+                    throw new SPTokenAcquisitionFailureException($"Access token cannot be acquired for the SharePoint AAD Auth. Failed with error: [{resultContent}]");
                 }
 
-                var tokenResult = JsonSerializer.Deserialize<JsonElement>(result);
+                var tokenResult = JsonSerializer.Deserialize<JsonElement>(resultContent);
                 string token = string.Empty;
 
                 try
@@ -72,12 +71,12 @@ namespace Pds.Contracts.ContractEventProcessor.Services.SharePointClient
                 catch (KeyNotFoundException ex)
                 {
                     _logger.LogError(ex, $"[{nameof(AcquireSPTokenAsync)}] - Access token cannot be acquired for the SharePoint AAD Auth. Site: {site.AbsoluteUri}");
-                    throw new SPTokenAcquisitionFailureException("Access token cannot be acquired for the SharePoint AAD Auth.");
+                    throw new SPTokenAcquisitionFailureException("Access token cannot be acquired for the SharePoint AAD Auth.", ex);
                 }
 
                 if (string.IsNullOrEmpty(token))
                 {
-                    throw new SPTokenAcquisitionFailureException("Access token cannot be acquired for the SharePoint AAD Auth.");
+                    throw new SPTokenAcquisitionFailureException($"Access token cannot be acquired from token result [{resultContent}] for the SharePoint AAD Auth.");
                 }
 
                 _logger.LogInformation($"[{nameof(AcquireSPTokenAsync)}] - Successfully acquired the SharePoint token from the SharePoint account access control. Site: {site.AbsoluteUri}");
