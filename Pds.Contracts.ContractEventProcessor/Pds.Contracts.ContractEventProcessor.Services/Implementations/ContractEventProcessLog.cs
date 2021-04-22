@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.ServiceBus;
+using Pds.Contracts.ContractEventProcessor.Services.Configurations;
 using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
 using Pds.Contracts.ContractEventProcessor.Services.Models;
 
@@ -18,7 +19,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
         public string CreateLogMessage(string log)
         {
             return _hasInitialised
-                ? $"{log} - Metadata- RunId: [{_message?.UserProperties["ContractEventProcessorRunId"]}] - Attempt:[{_message?.SystemProperties.DeliveryCount}] for message: [{_message?.MessageId}] in session [{_message?.SessionId}] with contract event bookmark [{_contractEvent?.BookmarkId}]"
+                ? $"{log} - Metadata- RunId: [{_message?.UserProperties[Constants.ContractEventProcessorRunIdKey]}] - Attempt:[{_message?.SystemProperties.DeliveryCount}] for message: [{_message?.MessageId}] in session [{_message?.SessionId}] with contract event bookmark [{_contractEvent?.BookmarkId}]"
                 : log;
         }
 

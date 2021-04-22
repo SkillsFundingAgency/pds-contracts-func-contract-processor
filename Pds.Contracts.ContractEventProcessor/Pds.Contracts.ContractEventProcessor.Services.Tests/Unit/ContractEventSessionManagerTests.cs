@@ -209,7 +209,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
 
             var mockLogger = Mock.Of<IContractEventProcessorLogger<IContractEventSessionManager>>(MockBehavior.Strict);
             Mock.Get(mockLogger)
-                .Setup(l => l.LogWarning(It.IsAny<string>()))
+                .Setup(l => l.LogWarning(It.IsAny<Exception>(), It.IsAny<string>()))
                 .Verifiable();
 
             var mockProcessLog = Mock.Of<IContractEventProcessLog>(MockBehavior.Strict);

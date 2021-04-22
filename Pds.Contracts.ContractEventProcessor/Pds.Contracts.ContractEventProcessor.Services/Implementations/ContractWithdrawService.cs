@@ -1,5 +1,7 @@
-﻿using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
+﻿using Pds.Contracts.ContractEventProcessor.Services.CustomExceptionHandlers;
+using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
 using Pds.Contracts.ContractEventProcessor.Services.Models;
+using Pds.Contracts.Data.Api.Client.Exceptions;
 using Pds.Contracts.Data.Api.Client.Interfaces;
 using Pds.Contracts.Data.Api.Client.Models;
 using System.Threading.Tasks;
@@ -29,17 +31,24 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
         /// <inheritdoc/>
         public async Task<bool> WithdrawAsync(ContractEvent contractEvent)
         {
-            var withdrawRequest = new WithdrawalRequest()
+            try
             {
-                ContractNumber = contractEvent.ContractNumber,
-                ContractVersion = contractEvent.ContractVersion,
-                FileName = contractEvent.ContractEventXml,
-                WithdrawalType = (ClientEnums.ContractStatus)contractEvent.Status
-            };
+                var withdrawRequest = new WithdrawalRequest()
+                {
+                    ContractNumber = contractEvent.ContractNumber,
+                    ContractVersion = contractEvent.ContractVersion,
+                    FileName = contractEvent.ContractEventXml,
+                    WithdrawalType = (ClientEnums.ContractStatus)contractEvent.Status
+                };
 
-            await _contractsDataService.WithdrawAsync(withdrawRequest);
+                await _contractsDataService.WithdrawAsync(withdrawRequest);
 
-            return true;
+                return true;
+            }
+            catch (ContractNotFoundClientException ex)
+            {
+                throw new ContractEventExpectationFailedException(contractEvent.BookmarkId, contractEvent.ContractNumber, contractEvent.ContractVersion, $"Withdraw called when a contract cannot be found.", ex);
+            }
         }
     }
 }

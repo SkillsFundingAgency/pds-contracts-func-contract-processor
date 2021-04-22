@@ -48,5 +48,11 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
         {
             _logger.LogWarning(_processLog.CreateLogMessage(message));
         }
+
+        /// <inheritdoc/>
+        public void LogWarning(Exception ex, string message)
+        {
+            _logger.LogWarning(ex, _processLog.CreateLogMessage(message));
+        }
     }
 }

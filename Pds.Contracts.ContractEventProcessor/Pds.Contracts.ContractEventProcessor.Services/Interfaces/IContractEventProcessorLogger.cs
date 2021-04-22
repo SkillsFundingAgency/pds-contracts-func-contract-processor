@@ -21,6 +21,13 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Interfaces
         void LogWarning(string message);
 
         /// <summary>
+        /// Logs the warning.
+        /// </summary>
+        /// <param name="ex">The ex.</param>
+        /// <param name="message">The message.</param>
+        void LogWarning(Exception ex, string message);
+
+        /// <summary>
         /// Logs the error.
         /// </summary>
         /// <param name="ex">The ex.</param>

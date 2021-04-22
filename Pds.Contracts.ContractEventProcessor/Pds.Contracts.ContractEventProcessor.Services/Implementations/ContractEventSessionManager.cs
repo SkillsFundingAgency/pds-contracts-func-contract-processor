@@ -106,14 +106,14 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
             state.FailedMessageReason = $"{reason} with error [{ex.Message}]";
             await _stateManager.SetWorkflowStateAsync(session, state);
 
-            var logMessage = $"[{nameof(ContractEventSessionManager)}.{nameof(ProcessSessionMessageAsync)}] - {reason} saving workflow state as faulted with failed message : {message.MessageId} for session: {session.SessionId}.";
+            var logMessage = $"[{nameof(ContractEventSessionManager)}.{nameof(ProcessSessionMessageAsync)}] - {reason} saving workflow state as faulted with failed message : {message.MessageId} for session: {session.SessionId}. With Exception: [{ex}]";
             if (ex is ContractEventExpectationFailedException)
             {
                 _logger.LogError(ex, logMessage);
             }
             else
             {
-                _logger.LogWarning(logMessage);
+                _logger.LogWarning(ex, logMessage);
             }
         }
     }
