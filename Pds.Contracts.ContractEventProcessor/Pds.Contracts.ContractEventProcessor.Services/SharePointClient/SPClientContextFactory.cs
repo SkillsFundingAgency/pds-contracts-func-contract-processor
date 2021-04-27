@@ -6,6 +6,7 @@ using Pds.Contracts.ContractEventProcessor.Services.Interfaces;
 using Pds.Core.Utils.Interfaces;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Pds.Contracts.ContractEventProcessor.Services.SharePointClient
@@ -13,6 +14,8 @@ namespace Pds.Contracts.ContractEventProcessor.Services.SharePointClient
     /// <inheritdoc/>
     public class SPClientContextFactory : ISPClientContextFactory
     {
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly ISPAuthenticationTokenService _spAuthenticationTokenService;
         private readonly ILogger<SPClientContextFactory> _logger;
@@ -58,17 +61,25 @@ namespace Pds.Contracts.ContractEventProcessor.Services.SharePointClient
         /// <returns>Returns the SharePoint authentication token.</returns>
         private async Task<string> EnsureAccessTokenAsync()
         {
-            _logger.LogInformation($"[{nameof(EnsureAccessTokenAsync)}] - Attempting to get the SharePoint Token.");
-
-            if (string.IsNullOrEmpty(_spAccessToken) || _spJwtSecurityToken == null || _spJwtSecurityToken.ValidTo <= _dateTimeProvider.Now())
+            await _semaphore.WaitAsync();
+            try
             {
-                _spAccessToken = await _spAuthenticationTokenService.AcquireSPTokenAsync();
-                _spJwtSecurityToken = new JwtSecurityToken(_spAccessToken);
+                _logger.LogInformation($"[{nameof(EnsureAccessTokenAsync)}] - Attempting to get the SharePoint Token.");
+
+                if (string.IsNullOrEmpty(_spAccessToken) || _spJwtSecurityToken == null || _spJwtSecurityToken.ValidTo <= _dateTimeProvider.UtcNow())
+                {
+                    _spAccessToken = await _spAuthenticationTokenService.AcquireSPTokenAsync();
+                    _spJwtSecurityToken = new JwtSecurityToken(_spAccessToken);
+                }
+
+                _logger.LogInformation($"[{nameof(EnsureAccessTokenAsync)}] - Acquired the SharePoint Token.");
+
+                return _spAccessToken;
             }
-
-            _logger.LogInformation($"[{nameof(EnsureAccessTokenAsync)}] - Acquired the SharePoint Token.");
-
-            return _spAccessToken;
+            finally
+            {
+                _semaphore.Release();
+            }
         }
     }
 }
