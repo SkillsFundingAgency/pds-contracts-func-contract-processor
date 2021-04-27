@@ -336,30 +336,6 @@
     },
     {
       "apiVersion": "2017-05-10",
-      "name": "contract-event-queue",
-      "resourceGroup": "[parameters('sharedResourceGroupName')]",
-      "type": "Microsoft.Resources/deployments",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(variables('deploymentUrlBase'),'service-bus-queue.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "serviceBusNamespaceName": {
-            "value": "[parameters('sharedServiceBusName')]"
-          },
-          "queueName": {
-            "value": "[variables('ContractEventQueueName')]"
-          },
-          "EnableSessions": {
-            "value": true
-          }
-        }
-      }
-    },
-    {
-      "apiVersion": "2017-05-10",
       "name": "[concat(variables('AppServicePlanName'), '-metric-', tolower(variables('AppServicePlanMetricsToAlertUpon')[copyIndex()].MetricName))]",
       "type": "Microsoft.Resources/deployments",
       "properties": {
