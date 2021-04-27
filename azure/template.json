@@ -330,8 +330,7 @@
         }
       },
       "dependsOn": [
-        "app-service-plan",
-        "contract-event-queue"
+        "app-service-plan"
       ]
     },
     {
