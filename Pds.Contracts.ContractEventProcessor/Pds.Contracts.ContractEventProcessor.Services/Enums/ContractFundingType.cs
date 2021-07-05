@@ -146,6 +146,12 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Enums
         /// The procured nineteen to twenty four traineeship
         /// </summary>
         [Display(Name = "Procured 19 to 24 traineeship", Description = "Procured 19 to 24 traineeship", ShortName = "19TRN2020")]
-        ProcuredNineteenToTwentyFourTraineeship = 22
+        ProcuredNineteenToTwentyFourTraineeship = 22,
+
+        /// <summary>
+        /// Adult Education Budget (Contract for Service)
+        /// </summary>
+        [Display(Name = "ESFA Adult Education Budget (procured from Aug 2021)", Description = "ESFA Adult Education Budget (procured from Aug 2021)", ShortName = "AEB2021")]
+        AdultEducationBudgetContractForService = 23
     }
 }
