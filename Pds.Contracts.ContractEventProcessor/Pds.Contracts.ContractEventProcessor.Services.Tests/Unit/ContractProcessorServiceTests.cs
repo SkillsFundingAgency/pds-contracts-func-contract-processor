@@ -431,7 +431,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
                 UKPRN = 12345678,
                 Value = 99999,
                 ContractData = "sample-blob-file.xml",
-                Title = "ESFA apprenticeship agreement April 2021 version 1",
+                Title = $"ESFA apprenticeship agreement {DateTime.Now.ToFullMonthAndFullYearDisplay()} version 1",
                 ContractAllocationNumber = "TestAllocNo0",
                 CreatedBy = "Feed-ContractEventProcessor",
                 PageCount = 0,
