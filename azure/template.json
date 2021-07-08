@@ -107,10 +107,6 @@
     },
     "ContractApiAppUri": {
       "type": "string"
-    },
-    "DisableFunctionApp": {
-      "type": "bool",
-      "defaultValue": false
     }
   },
   "variables": {
@@ -320,10 +316,6 @@
               {
                 "name": "SPClientServiceConfiguration:ShouldErrorPdfNotFound",
                 "value": "true"
-              },
-              {
-                "name": "AzureWebJobs.ContractEventProcessorFunction.Disabled",
-                "value": "[parameters('DisableFunctionApp')]"
               }
             ]
           }

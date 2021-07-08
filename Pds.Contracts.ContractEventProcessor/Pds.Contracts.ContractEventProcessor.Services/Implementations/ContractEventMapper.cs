@@ -144,6 +144,9 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                 case ContractFundingType.FurtherEducationConditionAllocation:
                     return $"{fundingTypeName} {variation}for {contractPeriod} version {contractEvent.ContractVersion}";
 
+                case ContractFundingType.AdultEducationBudgetContractForService:
+                    return $"{fundingTypeName} contract {variation}for {contractPeriod} version {contractEvent.ContractVersion}";
+
                 default:
                     throw new NotImplementedException($"Title for {nameof(fundingType)} with value {fundingType} is not implemented.");
             }
