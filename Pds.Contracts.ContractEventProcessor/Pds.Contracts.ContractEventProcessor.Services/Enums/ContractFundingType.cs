@@ -152,6 +152,12 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Enums
         /// Adult Education Budget (Contract for Service)
         /// </summary>
         [Display(Name = "ESFA Adult Education Budget (procured from Aug 2021)", Description = "ESFA Adult Education Budget (procured from Aug 2021)", ShortName = "AEB2021")]
-        AdultEducationBudgetContractForService = 23
+        AdultEducationBudgetContractForService = 23,
+
+        /// <summary>
+        /// Higher technical education provider growth fund contract
+        /// </summary>
+        [Display(Name = "Higher technical education provider growth fund", Description = "Higher technical education provider growth fund")]
+        HigherTechnicalEducation = 24
     }
 }

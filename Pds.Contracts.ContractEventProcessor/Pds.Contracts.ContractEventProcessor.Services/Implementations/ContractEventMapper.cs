@@ -145,6 +145,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                     return $"{fundingTypeName} {variation}for {contractPeriod} version {contractEvent.ContractVersion}";
 
                 case ContractFundingType.AdultEducationBudgetContractForService:
+                case ContractFundingType.HigherTechnicalEducation:
                     return $"{fundingTypeName} contract {variation}for {contractPeriod} version {contractEvent.ContractVersion}";
 
                 default:
