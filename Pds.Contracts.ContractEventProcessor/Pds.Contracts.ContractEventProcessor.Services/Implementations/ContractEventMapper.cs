@@ -256,10 +256,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
         {
             Regex pattern = new Regex("[-,+]");
             folderName = pattern.Replace(folderName, string.Empty);
-
-            Regex pattern2 = new Regex("[_,+]");
-            folderName = pattern2.Replace(folderName, "-");
-
             return System.Web.HttpUtility.UrlPathEncode(folderName);
         }
 
