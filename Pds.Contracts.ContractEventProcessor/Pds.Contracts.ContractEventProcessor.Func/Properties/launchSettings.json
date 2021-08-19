@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Pds.Contracts.ContractEventProcessor.Func": {
+      "commandName": "Project",
+      "commandLineArgs": "host start --pause-on-error --port 5800"
+    }
+  }
+}

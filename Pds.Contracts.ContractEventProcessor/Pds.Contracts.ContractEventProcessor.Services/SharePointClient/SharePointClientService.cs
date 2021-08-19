@@ -58,6 +58,8 @@ namespace Pds.Contracts.ContractEventProcessor.Services.SharePointClient
 
             string fileRelativeUrl = $"{_spConfig.RelativeSiteURL}/{libraryName}/{filename}";
 
+            _logger.LogInformation($"[{nameof(GetDocument)}] - Connecting to SharePoint with fileRelativeUrl: ${fileRelativeUrl}");
+
             try
             {
                 var file = _clientContext.Web.GetFileByServerRelativeUrl(fileRelativeUrl);
