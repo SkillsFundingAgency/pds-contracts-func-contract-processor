@@ -158,6 +158,18 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Enums
         /// Higher technical education provider growth fund contract
         /// </summary>
         [Display(Name = "Higher technical education provider growth fund", Description = "Higher technical education provider growth fund", ShortName = "HTE-PGF")]
-        HigherTechnicalEducation = 24
+        HigherTechnicalEducation = 24,
+
+        /// <summary>
+        /// Skills accelerator development fund contract
+        /// </summary>
+        [Display(Name = "Skills accelerator development fund", Description = "Skills accelerator development fund", ShortName = "SADF")]
+        SkillsAcceleratorDevelopment = 25,
+
+        /// <summary>
+        /// Further education professional development grants pilot contract
+        /// </summary>
+        [Display(Name = "Further education professional development grants pilot", Description = "Further education professional development grants", ShortName = "FE-PDGP")]
+        FurtherEducationProfessionalDevelopmentGrants = 26
     }
 }
