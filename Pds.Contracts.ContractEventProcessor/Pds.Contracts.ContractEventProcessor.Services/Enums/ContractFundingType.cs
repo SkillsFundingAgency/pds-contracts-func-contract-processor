@@ -170,6 +170,12 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Enums
         /// Further education professional development grants pilot contract
         /// </summary>
         [Display(Name = "Further education professional development grants pilot", Description = "Further education professional development grants", ShortName = "FE-PDGP")]
-        FurtherEducationProfessionalDevelopmentGrants = 26
+        FurtherEducationProfessionalDevelopmentGrants = 26,
+
+        /// <summary>
+        /// Further education professional development grants pilot contract
+        /// </summary>
+        [Display(Name = "Strategic Development Fund II", Description = "Strategic Development Fund II", ShortName = "SDFII")]
+        StrategicDevelopmentFund2 = 27
     }
 }

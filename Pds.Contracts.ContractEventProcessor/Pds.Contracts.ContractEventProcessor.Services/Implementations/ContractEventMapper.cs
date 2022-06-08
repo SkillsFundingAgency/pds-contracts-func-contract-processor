@@ -122,9 +122,9 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                     return $"{OrganizationNameAbbreviated} apprenticeship contract for {contractPeriod} version {contractEvent.ContractVersion}";
 
                 case ContractFundingType.SixteenNineteenFunding:
-                    return $"{fundingTypeName} contract for {contractPeriod} version {contractEvent.ContractVersion}";
-
                 case ContractFundingType.Aebp:
+                case ContractFundingType.ProcuredNineteenToTwentyFourTraineeship:
+                case ContractFundingType.StrategicDevelopmentFund2:
                     return $"{fundingTypeName} contract for {contractPeriod} version {contractEvent.ContractVersion}";
 
                 case ContractFundingType.Nla:
@@ -133,8 +133,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                 case ContractFundingType.AdvancedLearnerLoans:
                     return $"Advanced Learner Loans contract {variation}for {contractPeriod} version {contractEvent.ContractVersion}";
 
-                case ContractFundingType.ProcuredNineteenToTwentyFourTraineeship:
-                    return $"{fundingTypeName} contract for {contractPeriod} version {contractEvent.ContractVersion}";
+
 
                 case ContractFundingType.EducationAndSkillsFunding:
                 case ContractFundingType.NonLearningGrant:
