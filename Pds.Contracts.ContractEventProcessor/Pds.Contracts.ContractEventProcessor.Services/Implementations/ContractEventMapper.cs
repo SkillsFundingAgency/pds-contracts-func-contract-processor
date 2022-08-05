@@ -148,6 +148,8 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                 case ContractFundingType.SkillsAcceleratorDevelopment:
                 case ContractFundingType.FurtherEducationProfessionalDevelopmentGrants:
                     return $"{fundingTypeName} contract {variation}for {contractPeriod} version {contractEvent.ContractVersion}";
+                case ContractFundingType.SkillsBootcamps:
+                    return $"{fundingTypeName} contract {variation} version {contractEvent.ContractVersion}";
 
                 default:
                     throw new NotImplementedException($"Title for {nameof(fundingType)} with value {fundingType} is not implemented.");
