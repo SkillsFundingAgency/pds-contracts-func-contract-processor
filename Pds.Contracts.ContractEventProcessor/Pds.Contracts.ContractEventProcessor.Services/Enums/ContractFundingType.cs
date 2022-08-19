@@ -182,6 +182,12 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Enums
         /// Skills bootcamps contract
         /// </summary>
         [Display(Name = "Skills bootcamps", Description = "Skills bootcamps", ShortName = "SB")]
-        SkillsBootcamps = 28
+        SkillsBootcamps = 28,
+
+        /// <summary>
+        /// Multiply contract
+        /// </summary>
+        [Display(Name = "Multiply", Description = "Multiply", ShortName = "MULT")]
+        Multiply = 29
     }
 }
