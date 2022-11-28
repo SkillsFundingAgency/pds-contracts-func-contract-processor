@@ -193,7 +193,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Enums
         /// <summary>
         /// Additional capital allocations.
         /// </summary>
-        [Display(Name = "Additional capital allocations", Description = "Additional capital allocations")]
+        [Display(Name = "Additional capital allocations", Description = "Additional capital allocations", ShortName = "FE-ACA")]
         AdditionalCapitalAllocations = 30
     }
 }
