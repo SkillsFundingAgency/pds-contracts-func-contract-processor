@@ -188,6 +188,12 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Enums
         /// Multiply contract
         /// </summary>
         [Display(Name = "Multiply", Description = "Multiply", ShortName = "MULT")]
-        Multiply = 29
+        Multiply = 29,
+
+        /// <summary>
+        /// Additional capital allocations.
+        /// </summary>
+        [Display(Name = "Additional capital allocations", Description = "Additional capital allocations")]
+        AdditionalCapitalAllocations = 30
     }
 }

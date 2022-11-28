@@ -149,6 +149,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                 case ContractFundingType.FurtherEducationProfessionalDevelopmentGrants:
                     return $"{fundingTypeName} contract {variation}for {contractPeriod} version {contractEvent.ContractVersion}";
                 case ContractFundingType.SkillsBootcamps:
+                case ContractFundingType.AdditionalCapitalAllocations:
                     return $"{fundingTypeName} contract {variation} version {contractEvent.ContractVersion}";
                 case ContractFundingType.Multiply:
                     return $"{fundingTypeName} Programme contract {variation}for {contractPeriod} version {contractEvent.ContractVersion}";
