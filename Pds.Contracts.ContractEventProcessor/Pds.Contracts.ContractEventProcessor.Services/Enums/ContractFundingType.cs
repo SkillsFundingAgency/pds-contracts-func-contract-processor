@@ -194,6 +194,12 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Enums
         /// Additional capital allocations.
         /// </summary>
         [Display(Name = "Additional capital allocations", Description = "Additional capital allocations", ShortName = "FE-ACA")]
-        AdditionalCapitalAllocations = 30
+        AdditionalCapitalAllocations = 30,
+
+        /// <summary>
+        /// Higher technical education skills injection fund.
+        /// </summary>
+        [Display(Name = "Higher technical education skills injection fund", Description = "Higher technical education skills injection fund", ShortName = "HTE-SIF")]
+        HigherTechnicalEducationSkillsInjectionFund = 31,
     }
 }
