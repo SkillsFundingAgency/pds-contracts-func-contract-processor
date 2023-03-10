@@ -201,5 +201,11 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Enums
         /// </summary>
         [Display(Name = "Higher technical education skills injection fund", Description = "Higher technical education skills injection fund", ShortName = "HTE-SIF")]
         HigherTechnicalEducationSkillsInjectionFund = 31,
+
+        /// <summary>
+        /// FE Reclassification Capital Allocation.
+        /// </summary>
+        [Display(Name = "FE Reclassification Capital Allocation", Description = "FE Reclassification Capital Allocation", ShortName = "FE-RCA")]
+        FEReclassificationCapitalAllocation = 32,
     }
 }
