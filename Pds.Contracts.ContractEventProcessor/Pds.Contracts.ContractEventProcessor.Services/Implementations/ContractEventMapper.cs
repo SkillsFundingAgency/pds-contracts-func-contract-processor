@@ -126,6 +126,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                 case ContractFundingType.ProcuredNineteenToTwentyFourTraineeship:
                 case ContractFundingType.StrategicDevelopmentFund2:
                 case ContractFundingType.FEReclassificationCapitalAllocation:
+                case ContractFundingType.FECapitalTransformationFundAllocation:
 
                     return $"{fundingTypeName} contract for {contractPeriod} version {contractEvent.ContractVersion}";
 
