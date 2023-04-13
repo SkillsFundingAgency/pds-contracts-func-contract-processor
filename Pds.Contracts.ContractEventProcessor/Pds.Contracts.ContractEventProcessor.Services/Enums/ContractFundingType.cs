@@ -207,5 +207,11 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Enums
         /// </summary>
         [Display(Name = "FE Reclassification Capital Allocation", Description = "FE Reclassification Capital Allocation", ShortName = "FE-RCA")]
         FEReclassificationCapitalAllocation = 32,
+
+        /// <summary>
+        /// FE Capital Transformation Fund Allocation.
+        /// </summary>
+        [Display(Name = "FE Capital Transformation Fund Allocation", Description = "FE Capital Transformation Fund Allocation", ShortName = "FE-CTF")]
+        FECapitalTransformationFundAllocation = 33,
     }
 }
