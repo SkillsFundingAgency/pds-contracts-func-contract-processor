@@ -213,5 +213,11 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Enums
         /// </summary>
         [Display(Name = "FE Capital Transformation Fund Allocation", Description = "FE Capital Transformation Fund Allocation", ShortName = "FE-CTF")]
         FECapitalTransformationFundAllocation = 33,
+
+        /// <summary>
+        /// ESFA Adult Education Budget (procured from Aug 2023).
+        /// </summary>
+        [Display(Name = "ESFA Adult Education Budget (procured from Aug 2023)", Description = "ESFA Adult Education Budget (procured from Aug 2023)", ShortName = "AEB2023")]
+        AdultEducationBudgetProcured2023 = 34
     }
 }
