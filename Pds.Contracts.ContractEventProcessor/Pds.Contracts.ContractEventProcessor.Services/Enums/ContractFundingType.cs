@@ -218,6 +218,12 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Enums
         /// ESFA Adult Education Budget (procured from Aug 2023).
         /// </summary>
         [Display(Name = "ESFA Adult Education Budget (procured from Aug 2023)", Description = "ESFA Adult Education Budget (procured from Aug 2023)", ShortName = "AEB2023")]
-        AdultEducationBudgetProcured2023 = 34
+        AdultEducationBudgetProcured2023 = 34,
+
+        /// <summary>
+        /// Skills Bootcamps Dynamic Purchasing System.
+        /// </summary>
+        [Display(Name = "Skills bootcamps", Description = "Skills bootcamps dynamic purchasing system (DPS)", ShortName = "SBD")]
+        SkillsBootcampsDPS = 35,
     }
 }
