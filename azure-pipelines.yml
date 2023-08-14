@@ -44,6 +44,12 @@ jobs:
         Copy-Item -Path "$(downloadAsposeLicense.secureFilePath)" -Destination "$sourceDestination\Aspose.Total.lic"
         Write-Host "File copied!"
 
+  - task: UseDotNet@2
+    displayName: 'Use .NET Core sdk'
+    inputs:
+      packageType: sdk
+      version: 6.x
+
   - task: DotNetCoreCLI@2
     displayName: Restore
     inputs:
