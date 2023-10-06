@@ -150,6 +150,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                 case ContractFundingType.HigherTechnicalEducation:
                 case ContractFundingType.SkillsAcceleratorDevelopment:
                 case ContractFundingType.FurtherEducationProfessionalDevelopmentGrants:
+                case ContractFundingType.HigherTechnicalEducationSkillsInjectionFund2:
                     return $"{fundingTypeName} contract {variation}for {contractPeriod} version {contractEvent.ContractVersion}";
                 case ContractFundingType.SkillsBootcamps:
                 case ContractFundingType.SkillsBootcampsDPS:
