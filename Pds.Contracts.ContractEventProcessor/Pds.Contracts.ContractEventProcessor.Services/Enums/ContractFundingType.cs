@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Converters;
+﻿using Microsoft.Azure.Amqp.Framing;
+using Newtonsoft.Json.Converters;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -225,5 +226,11 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Enums
         /// </summary>
         [Display(Name = "Skills bootcamps", Description = "Skills bootcamps dynamic purchasing system (DPS)", ShortName = "SBD")]
         SkillsBootcampsDPS = 35,
+
+        /// <summary>
+        /// Higher technical education skills injection fund 2.
+        /// </summary>
+        [Display(Name = "Higher technical education skills injection fund 2", Description = "Higher technical education skills injection fund 2", ShortName = "HTE-SIF2")]
+        HigherTechnicalEducationSkillsInjectionFund2 = 36
     }
 }
