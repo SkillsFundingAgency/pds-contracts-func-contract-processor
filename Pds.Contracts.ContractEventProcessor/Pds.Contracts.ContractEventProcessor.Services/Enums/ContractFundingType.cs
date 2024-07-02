@@ -1,5 +1,4 @@
-﻿using Microsoft.Azure.Amqp.Framing;
-using Newtonsoft.Json.Converters;
+﻿using Newtonsoft.Json.Converters;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -217,6 +216,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Enums
 
         /// <summary>
         /// ESFA Adult Education Budget (procured from Aug 2023).
+        /// Shares AEB2023 funding type from FCS with ESFA Adult Skills Fund (procured from Aug 2023).
         /// </summary>
         [Display(Name = "ESFA Adult Education Budget (procured from Aug 2023)", Description = "ESFA Adult Education Budget (procured from Aug 2023)", ShortName = "AEB2023")]
         AdultEducationBudgetProcured2023 = 34,
@@ -231,6 +231,13 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Enums
         /// Higher technical education skills injection fund 2.
         /// </summary>
         [Display(Name = "Higher technical education skills injection fund 2", Description = "Higher technical education skills injection fund 2", ShortName = "HTE-SIF2")]
-        HigherTechnicalEducationSkillsInjectionFund2 = 36
+        HigherTechnicalEducationSkillsInjectionFund2 = 36,
+
+        /// <summary>
+        /// ESFA Adult Skills Fund (procured from Aug 2023).
+        /// Shares AEB2023 funding type from FCS with ESFA Adult Education Budget (procured from Aug 2023).
+        /// </summary>
+        [Display(Name = "ESFA Adult Skills Fund (procured from Aug 2023)", Description = "ESFA Adult Skills Fund (procured from Aug 2023)", ShortName = "AEB2023")]
+        AdultSkillsFundProcured2023 = 37
     }
 }
