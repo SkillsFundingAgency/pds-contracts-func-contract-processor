@@ -38,6 +38,9 @@
     "sharedStorageAccountName": {
       "type": "string"
     },
+    "sharedKeyVaultName": {
+      "type": "string"      
+    },
     "ActionGroupName": {
       "type": "string",
       "defaultValue": ""
@@ -59,9 +62,6 @@
     "AuditApiAzureAdClientId": {
       "type": "string"
     },
-    "AuditApiAzureAdClientSecret": {
-      "type": "securestring"
-    },
     "AuditApiAzureAdAppUri": {
       "type": "string"
     },
@@ -76,9 +76,6 @@
     },
     "SharepointApiClientId": {
       "type": "string"
-    },
-    "SharepointApiClientSecret": {
-      "type": "securestring"
     },
     "SharepointApiAppUri": {
       "type": "string"
@@ -101,9 +98,6 @@
     },
     "ContractApiClientId": {
       "type": "string"
-    },
-    "ContractApiClientSecret": {
-      "type": "securestring"
     },
     "ContractApiAppUri": {
       "type": "string"
@@ -239,7 +233,7 @@
               },
               {
                 "name": "ContractsDataApiConfiguration:ClientSecret",
-                "value": "[parameters('ContractApiClientSecret')]"
+                "value": "[concat('@Microsoft.KeyVault(VaultName=', parameters('sharedKeyVaultName'), ';SecretName=ContractsDataApiClientSecret)')]"
               },
               {
                 "name": "ContractsDataApiConfiguration:AppUri",
@@ -267,7 +261,7 @@
               },
               {
                 "name": "AuditApiClientConfiguration:ClientSecret",
-                "value": "[parameters('AuditApiAzureAdClientSecret')]"
+                "value": "[concat('@Microsoft.KeyVault(VaultName=', parameters('sharedKeyVaultName'), ';SecretName=SharedAuditDataApiSecret)')]"
               },
               {
                 "name": "AuditApiClientConfiguration:AppUri",
@@ -291,7 +285,7 @@
               },
               {
                 "name": "SPClientServiceConfiguration:ClientSecret",
-                "value": "[parameters('SharepointApiClientSecret')]"
+                "value": "[concat('@Microsoft.KeyVault(VaultName=', parameters('sharedKeyVaultName'), ';SecretName=FcsSharepointApiClientSecret)')]"
               },
               {
                 "name": "SPClientServiceConfiguration:TenantId",
