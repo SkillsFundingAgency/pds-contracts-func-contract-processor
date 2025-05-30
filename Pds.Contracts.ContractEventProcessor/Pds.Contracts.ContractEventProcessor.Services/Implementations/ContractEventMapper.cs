@@ -128,6 +128,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                 case ContractFundingType.FEReclassificationCapitalAllocation:
                 case ContractFundingType.FECapitalTransformationFundAllocation:
                 case ContractFundingType.AdultEducationBudgetProcured2023:
+                case ContractFundingType.AdultSkillsFund:
                 case ContractFundingType.AdultSkillsFundProcured2023:
                     return $"{fundingTypeName} contract for {contractPeriod} version {contractEvent.ContractVersion}";
 

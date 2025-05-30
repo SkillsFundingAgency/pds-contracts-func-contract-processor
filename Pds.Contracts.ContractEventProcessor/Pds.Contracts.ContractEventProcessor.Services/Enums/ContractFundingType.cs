@@ -244,6 +244,13 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Enums
         /// Taking teaching further.
         /// </summary>
         [Display(Name = "Taking teaching further", Description = "Taking teaching further", ShortName = "TTF")]
-        TakingTeachingFurther = 38
+        TakingTeachingFurther = 38,
+
+        /// <summary>
+        /// DfE Adult Skills Fund.
+        /// Shares AEB2023 funding type from FCS with ESFA Adult Education Budget (procured from Aug 2023).
+        /// </summary>
+        [Display(Name = "DfE Adult Skills Fund", Description = "DfE Adult Skills Fund", ShortName = "AEB2023")]
+        AdultSkillsFund = 39
     }
 }
