@@ -113,6 +113,12 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                     return $"{fundingTypeName} {specification} contract {variation}for {lepArea} version {contractEvent.ContractVersion}";
 
                 case ContractFundingType.Levy:
+                    if (GetStartingYear(contractEvent.ContractPeriodValue) >= 25)
+                    {
+                        return
+                            $"Apprenticeship agreement {DateTime.Now.ToFullMonthAndFullYearDisplay()} version {contractEvent.ContractVersion}";
+                    }
+
                     return $"{OrganizationNameAbbreviated} {fundingTypeName} {DateTime.Now.ToFullMonthAndFullYearDisplay()} version {contractEvent.ContractVersion}";
 
                 case ContractFundingType.Ncs:

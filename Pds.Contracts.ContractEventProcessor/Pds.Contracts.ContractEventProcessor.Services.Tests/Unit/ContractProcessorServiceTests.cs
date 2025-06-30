@@ -108,6 +108,8 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
         [DataRow(ContractFundingType.TakingTeachingFurther, 2, "2425", "Taking teaching further contract variation for 2024 to 2025 version 2")]
         [DataRow(ContractFundingType.AdultSkillsFund, 1, "2526", "DfE Adult Skills Fund contract for 2025 to 2026 version 1")]
         [DataRow(ContractFundingType.AdultSkillsFund, 2, "2526", "DfE Adult Skills Fund contract for 2025 to 2026 version 2")]
+        [DataRow(ContractFundingType.Levy, 1, "2526", "Apprenticeship agreement {MonthYear} version 1", TemplateType.MonthYear)]
+        [DataRow(ContractFundingType.Levy, 2, "2526", "Apprenticeship agreement {MonthYear} version 2", TemplateType.MonthYear)]
         public void CreateContractTitle_ExpectedResult(ContractFundingType fundingType, int version, string contractPeriodValue, string expectedTitle, TemplateType templateType = TemplateType.None)
         {
             //Arrange
