@@ -113,7 +113,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                     return $"{fundingTypeName} {specification} contract {variation}for {lepArea} version {contractEvent.ContractVersion}";
 
                 case ContractFundingType.Levy:
-                    return $"{OrganizationNameAbbreviated} {fundingTypeName} {DateTime.Now.ToFullMonthAndFullYearDisplay()} version {contractEvent.ContractVersion}";
+                    return $"Apprenticeship agreement {DateTime.Now.ToFullMonthAndFullYearDisplay()} version {contractEvent.ContractVersion}";
 
                 case ContractFundingType.Ncs:
                     return $"{fundingTypeName} contract {variation}for {contractPeriod} version {contractEvent.ContractVersion}";

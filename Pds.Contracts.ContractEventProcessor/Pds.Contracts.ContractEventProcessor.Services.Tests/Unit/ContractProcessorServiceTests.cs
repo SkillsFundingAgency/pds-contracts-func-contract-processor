@@ -68,8 +68,8 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
         [DataRow(ContractFundingType.Eof, 2, "1799", "2017/99 EOF contract variation version 2")]
         [DataRow(ContractFundingType.Esf, 1, "1799", "ESF Test tender spec title contract for Test LEP Area version 1")] // Allocation
         [DataRow(ContractFundingType.Esf, 2, "1799", "ESF Test tender spec title contract variation for Test LEP Area version 2")] // Allocation
-        [DataRow(ContractFundingType.Levy, 1, "1799", "ESFA apprenticeship agreement {MonthYear} version 1", TemplateType.MonthYear)]
-        [DataRow(ContractFundingType.Levy, 2, "1799", "ESFA apprenticeship agreement {MonthYear} version 2", TemplateType.MonthYear)]
+        [DataRow(ContractFundingType.Levy, 1, "1799", "Apprenticeship agreement {MonthYear} version 1", TemplateType.MonthYear)]
+        [DataRow(ContractFundingType.Levy, 2, "1799", "Apprenticeship agreement {MonthYear} version 2", TemplateType.MonthYear)]
         [DataRow(ContractFundingType.Ncs, 1, "1799", "National Careers Service (NCS) contract for 2017 to 2099 version 1")]
         [DataRow(ContractFundingType.Ncs, 2, "1799", "National Careers Service (NCS) contract variation for 2017 to 2099 version 2")]
         [DataRow(ContractFundingType.NonLevy, 1, "1799", "ESFA apprenticeship contract for 2017 to 2099 version 1")]
@@ -108,6 +108,8 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
         [DataRow(ContractFundingType.TakingTeachingFurther, 2, "2425", "Taking teaching further contract variation for 2024 to 2025 version 2")]
         [DataRow(ContractFundingType.AdultSkillsFund, 1, "2526", "DfE Adult Skills Fund contract for 2025 to 2026 version 1")]
         [DataRow(ContractFundingType.AdultSkillsFund, 2, "2526", "DfE Adult Skills Fund contract for 2025 to 2026 version 2")]
+        [DataRow(ContractFundingType.Levy, 1, "2526", "Apprenticeship agreement {MonthYear} version 1", TemplateType.MonthYear)]
+        [DataRow(ContractFundingType.Levy, 2, "2526", "Apprenticeship agreement {MonthYear} version 2", TemplateType.MonthYear)]
         public void CreateContractTitle_ExpectedResult(ContractFundingType fundingType, int version, string contractPeriodValue, string expectedTitle, TemplateType templateType = TemplateType.None)
         {
             //Arrange
@@ -443,7 +445,7 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Tests.Unit
                 UKPRN = 12345678,
                 Value = 99999,
                 ContractData = "sample-blob-file.xml",
-                Title = $"ESFA apprenticeship agreement {DateTime.Now.ToFullMonthAndFullYearDisplay()} version 1",
+                Title = $"Apprenticeship agreement {DateTime.Now.ToFullMonthAndFullYearDisplay()} version 1",
                 ContractAllocationNumber = "TestAllocNo0",
                 CreatedBy = "Feed-ContractEventProcessor",
                 PageCount = 0,
