@@ -258,5 +258,11 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Enums
         /// </summary>
         [Display(Name = "Taking teaching further", Description = "Taking teaching further", ShortName = "TTFY2")]
         TakingTeachingFurtherYear2 = 40,
+
+        /// <summary>
+        /// Construction Technical Excellence Colleges.
+        /// </summary>
+        [Display(Name = "Construction Technical Excellence Colleges", Description = "Construction Technical Excellence Colleges", ShortName = "CTEC")]
+        ConstructionTechnicalExcellenceColleges = 41,
     }
 }

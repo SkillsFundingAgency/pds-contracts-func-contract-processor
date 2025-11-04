@@ -138,8 +138,6 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                 case ContractFundingType.AdvancedLearnerLoans:
                     return $"Advanced Learner Loans contract {variation}for {contractPeriod} version {contractEvent.ContractVersion}";
 
-
-
                 case ContractFundingType.EducationAndSkillsFunding:
                 case ContractFundingType.NonLearningGrant:
                 case ContractFundingType.SixteenEighteenForensicUnit:
@@ -163,6 +161,8 @@ namespace Pds.Contracts.ContractEventProcessor.Services.Implementations
                     return $"{fundingTypeName} contract {variation}version {contractEvent.ContractVersion}";
                 case ContractFundingType.Multiply:
                     return $"{fundingTypeName} Programme contract {variation}for {contractPeriod} version {contractEvent.ContractVersion}";
+                case ContractFundingType.ConstructionTechnicalExcellenceColleges:
+                    return $"{fundingTypeName} - revenue contract for {contractPeriod} version {contractEvent.ContractVersion}";
                 default:
                     throw new NotImplementedException($"Title for {nameof(fundingType)} with value {fundingType} is not implemented.");
             }
